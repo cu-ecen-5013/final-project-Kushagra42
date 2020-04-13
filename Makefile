@@ -14,15 +14,18 @@ ifeq ($(LDFLAGS),)
 endif
 
 #Recipe to compile writer.c
-all:Client_OP Server_OP
+all:Client_OP Server_OP Hello
 
 Client_OP:./Socket_Client/Client
 	$(CC) $(CFLAGS) -o Client ./Socket_Client/Client.c
 	
 Server_OP:./Socket_Server/Server
-	$(CC) $(CFLAGS) -o Server ./Socket_Server/Server.c	
+	$(CC) $(CFLAGS) -o Server ./Socket_Server/Server.c
+
+Hello_OP: Hello
+	$(CC) $(CFLAGS) -o Hello Hello.c
 
 
 #cleaning all the executable files
 clean:
-	rm -f *.o Client Server
+	rm -f *.o Client Server Hello

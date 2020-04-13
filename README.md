@@ -2,6 +2,11 @@
 
 ### Repository owner- Kushagra Pandey 
 
+Sprint 1: Server-Client socket program - tested on local host.
+	  Server listens to the client. CLient forms the connection and sends data to the server on every connection.
+	  Server appends stores the the data in /var/tmp/aesdsocketdata.txt.
+		
+
 The repository includes the final project links and folders for Advanced Embedded Software Design ECEN 5013. Overview of project found below.
 
 # Repository Overview

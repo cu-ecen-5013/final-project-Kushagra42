@@ -32,7 +32,7 @@ int main(){
 
    //usleep(100000);                 //give the Arduino a chance to respond
    fcntl(file, F_SETFL, 0);
-   unsigned char receive[100];      //declare a buffer for receiving data
+   unsigned int receive[100];      //declare a buffer for receiving data
    if ((count = read(file, (void*)receive, 100))<0){   //receive the data
       perror("Failed to read from the input\n");
       return -1;

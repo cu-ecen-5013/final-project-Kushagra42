@@ -26,20 +26,35 @@ int main(){
    //   9600 baud, 8-bit, enable receiver, no modem control lines
    options.c_cflag = B115200 | CS8 | CREAD | CLOCAL;
    options.c_iflag = IGNPAR | ICRNL;    //ignore partity errors, CR -> newline
+    
+   tcflush(file, TCIFLUSH);             //discard file information not transmitted
+   tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
+
+   unsigned char transmit[18] = "Hello BeagleBone!";  //the string to send
+
+   if ((count = write(file, &transmit,18))<0){        //send the string
+      perror("Failed to write to the output\n");
+      return -1;
+   }
+   usleep(1000000); 
+   close(file);
+
+
+//read/////////////////
+   if ((file = open("/dev/ttyO4", O_RDWR | O_NOCTTY | O_NDELAY))<0){
+      perror("UART: Failed to open the file.\n");
+      return -1;
+   }
+
+   // Set up the communications options:
+   //   9600 baud, 8-bit, enable receiver, no modem control lines
+   options.c_cflag = B115200 | CS8 | CREAD | CLOCAL;
+   options.c_iflag = IGNPAR | ICRNL;    //ignore partity errors, CR -> newline
    options.c_oflag = 0;
    options.c_lflag = 0;
    
    tcflush(file, TCIFLUSH);             //discard file information not transmitted
    tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
-
-   //unsigned char transmit[18] = "Hello BeagleBone!";  //the string to send
-
-   /*if ((count = write(file, &transmit,18))<0){        //send the string
-      perror("Failed to write to the output\n");
-      return -1;
-   }*/
-   //usleep(1000000); 
-
    //fcntl used to wait for read to occur
    fcntl(file, F_SETFL, 0);
 

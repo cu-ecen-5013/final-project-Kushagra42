@@ -8,7 +8,7 @@
 int main(){
 	int file, count;
 
-	if ((file = open("/dev/ttyO1", O_RDWR | O_NOCTTY | O_NDELAY))<0)
+	if ((file = open("/dev/ttyO4", O_RDWR | O_NOCTTY | O_NDELAY))<0)
 	{
 	     perror("UART: Failed to open the file.\n");
 	     return -1;

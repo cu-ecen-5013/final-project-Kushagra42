@@ -36,13 +36,10 @@ int main(){
       perror("Failed to write to the output\n");
       return -1;
    }
-   usleep(1000000); 
+   usleep(10000000); 
   
+   //fcntl(file, F_SETFL, 0);
 
-
-    //read/////////////////
-   //fcntl used to wait for read to occur
-   fcntl(file, F_SETFL, 0);
 
    unsigned char receive[100];      //declare a buffer for receiving data
    if ((count = read(file, (void*)receive, 100))<0){   //receive the data

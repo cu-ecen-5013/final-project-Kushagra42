@@ -20,15 +20,15 @@ int main(){
    tcflush(file, TCIFLUSH);             //discard file information not transmitted
    tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
 
-   /*unsigned char transmit[18] = "Hello BeagleBone!";  //the string to send
+   unsigned char transmit[18] = "Hello BeagleBone!";  //the string to send
 
    if ((count = write(file, &transmit,18))<0){        //send the string
       perror("Failed to write to the output\n");
       return -1;
    }
 
-   usleep(100000);*/                  //give the Arduino a chance to respond
-  fcntl(file, F_SETFL, 0);
+   usleep(100000);                 //give the Arduino a chance to respond
+  //fcntl(file, F_SETFL, 0);
    unsigned char receive[100];      //declare a buffer for receiving data
    if ((count = read(file, (void*)receive, 100))<0){   //receive the data
       perror("Failed to read from the input\n");

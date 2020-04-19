@@ -14,7 +14,7 @@ ifeq ($(LDFLAGS),)
 endif
 
 #Recipe to compile writer.c
-all:Client_OP Server_OP Hello_OP Uart_OP
+all:Client_OP Server_OP Hello_OP Uart_write_OP Uart_read_OP
 
 Client_OP:./Socket_Client/Client
 	$(CC) $(CFLAGS) -o Client ./Socket_Client/Client.c
@@ -25,9 +25,12 @@ Server_OP:./Socket_Server/Server
 Hello_OP: Hello
 	$(CC) $(CFLAGS) -o Hello Hello.c
 
-Uart_OP:./UART_Communication/uart
-	$(CC) $(CFLAGS) -o uart ./UART_Communication/uart.c
+Uart_write_OP:./UART_Communication/uart_write
+	$(CC) $(CFLAGS) -o uart_write ./UART_Communication/uart_write.c
+
+Uart_read_OP:./UART_Communication/uart_read
+	$(CC) $(CFLAGS) -o uart_read ./UART_Communication/uart_read.c
 
 #cleaning all the executable files
 clean:
-	rm -f *.o Client Server Hello uart
+	rm -f *.o Client Server Hello uart_write uart_read

@@ -25,7 +25,9 @@ Server_OP:./Socket_Server/Server
 Hello_OP: Hello
 	$(CC) $(CFLAGS) -o Hello Hello.c
 
+Uart_OP:./UART_Communication/UART
+	$(CC) $(CFLAGS) -o UART UART.c
 
 #cleaning all the executable files
 clean:
-	rm -f *.o Client Server Hello
+	rm -f *.o Client Server Hello UART

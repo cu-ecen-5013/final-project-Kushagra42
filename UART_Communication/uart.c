@@ -32,12 +32,13 @@ int main(){
    tcflush(file, TCIFLUSH);             //discard file information not transmitted
    tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
 
-   unsigned char transmit[18] = "Hello BeagleBone!";  //the string to send
+   //unsigned char transmit[18] = "Hello BeagleBone!";  //the string to send
 
-   if ((count = write(file, &transmit,18))<0){        //send the string
+   /*if ((count = write(file, &transmit,18))<0){        //send the string
       perror("Failed to write to the output\n");
       return -1;
-   }
+   }*/
+   //usleep(1000000); 
 
    //fcntl used to wait for read to occur
    fcntl(file, F_SETFL, 0);

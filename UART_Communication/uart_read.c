@@ -27,8 +27,8 @@ int main(){
       return -1;
    }
 
-   usleep(100000);                 //give the Arduino a chance to respond
-   fcntl(file, F_SETFL, O_NONBLOCK);
+   //usleep(100000);                 //give the Arduino a chance to respond
+   fcntl(file, F_SETFL, 0);
    unsigned char receive[100];      //declare a buffer for receiving data
    if ((count = read(file, (void*)receive, 100))<0){   //receive the data
       perror("Failed to read from the input\n");

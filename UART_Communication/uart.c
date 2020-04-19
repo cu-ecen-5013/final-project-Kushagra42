@@ -28,6 +28,7 @@ int main(){
    options.c_iflag = IGNPAR | ICRNL;    //ignore partity errors, CR -> newline
    options.c_oflag = 0;
    options.c_lflag = 0;
+   
    tcflush(file, TCIFLUSH);             //discard file information not transmitted
    tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
 
@@ -38,7 +39,8 @@ int main(){
       return -1;
    }
 
-   usleep(100000);                  //give the Arduino a chance to respond
+   //fcntl used to wait for read to occur
+   fcntl(file, F_SETFL, 0);
 
    unsigned char receive[100];      //declare a buffer for receiving data
    if ((count = read(file, (void*)receive, 100))<0){   //receive the data

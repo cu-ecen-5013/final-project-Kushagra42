@@ -72,26 +72,28 @@ int main(int argc, char ** argv)
 
   tcsetattr(fd, TCSANOW, &options);
   // Write to the port
-  unsigned char tx_buffer[20];
-  unsigned char *p_tx_buffer;
-	
-  p_tx_buffer = &tx_buffer[0];
-  *p_tx_buffer++ = 'H';
-  *p_tx_buffer++ = 'e';
-  *p_tx_buffer++ = 'l';
-  *p_tx_buffer++ = 'l';
-  *p_tx_buffer++ = 'o';
+  unsigned char tx_buffer[20]= "Hello Aesd";
+//  unsigned char *p_tx_buffer;
+  printf("Testing uart ");	
+//  p_tx_buffer = &tx_buffer[0];
+//  *p_tx_buffer++ = 'H';
+//  *p_tx_buffer++ = 'e';
+//  *p_tx_buffer++ = 'l';
+//  *p_tx_buffer++ = 'l';
+//  *p_tx_buffer++ = 'o';
 //  int n = write("Hi testing uart functionality for raspi\n");
-  int n = write(fd,&tx_buffer[0],(p_tx_buffer - &tx_buffer[0]));
+  int n = write(fd, &tx_buffer, 11);		//Filestream, bytes to write, number of bytes to write
+//  int n = write(fd,&tx_buffer[0],(p_tx_buffer - &tx_buffer[0]));
   if (n < 0) 
   {
     perror("Write failure ");
     return -1;
   }
-
+  
+  usleep(10000);
   // Read up to 255 characters from the port if they are there
   char buf[256];
-  n = read(fd, (void*)buf, 255);
+  n = read(fd, (void*)buf, 11);
   if (n < 0) 
   {
     perror("Read failure ");

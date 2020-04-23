@@ -16,11 +16,15 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <time.h>
 
 #define Si7021_address 0x40
-
+int beaglebone=1;
 int main()
 {
+	time_t time_current;
+	struct tm *local = NULL;
+	char *time_buffer = NULL;
 	// Create I2C bus
 	int file;
 	char *bus = "/dev/i2c-1";
@@ -39,42 +43,55 @@ int main()
 
 	// Read 2 bytes of humidity data
 	// humidity msb, humidity lsb
-	char data[2] = {0};
-	if(read(file, data, 2) != 2)
+	
+	while(1)
 	{
-		printf("Error : Input/Output error \n");
-	}
-	else
-	{
-		// Convert the data
-		float humidity = (((data[0] * 256 + data[1]) * 125.0) / 65536.0) - 6;
+		if(beaglebone==1)
+		{
+		char data[2] = {0};
+		if(read(file, data, 2) != 2)
+		{
+			printf("Error : Input/Output error \n");
+		}
+		else
+		{
+			// Convert the data
+			float humidity = (((data[0] * 256 + data[1]) * 125.0) / 65536.0) - 6;
 
-		// Output data to screen
-		printf("Relative Humidity : %.2f RH \n", humidity);
-	}
+			// Output data to screen
+			printf("Relative Humidity : %.2f RH \n", humidity);
+		}
 
-	// Send temperature measurement command, NO HOLD MASTER(0xF3)
-	config[0] = 0xF3;
-	write(file, config, 1); 
-	sleep(1);
+		// Send temperature measurement command, NO HOLD MASTER(0xF3)
+		config[0] = 0xF3;
+		write(file, config, 1); 
+		sleep(1);
 
-	// Read 2 bytes of temperature data
-	// temp msb, temp lsb
-	if(read(file, data, 2) != 2)
-	{
-		printf("Error : Input/Output error \n");
-	}
-	else
-	{
-		// Convert the data
-		float cTemp = (((data[0] * 256 + data[1]) * 175.72) / 65536.0) - 46.85;
-		float fTemp = cTemp * 1.8 + 32;
+		// Read 2 bytes of temperature data
+		// temp msb, temp lsb
+		if(read(file, data, 2) != 2)
+		{
+			printf("TIME:%s    Error : Input/Output error \n",time_buffer);
+		}
+		else
+		{
+			time( &time_current );
+	
+			local = localtime( &time_current );
+	
+			time_buffer = asctime(local);
+			// Convert the data
+			float cTemp = (((data[0] * 256 + data[1]) * 175.72) / 65536.0) - 46.85;
+			float fTemp = cTemp * 1.8 + 32;
 
-		// Output data to screen
-		printf("Temperature in Celsius : %.2f C \n", cTemp);
-		printf("Temperature in Fahrenheit : %.2f F \n", fTemp);
+			// Output data to screen
+			printf("TIME:%s    Temperature in Celsius : %.2f C \n",time_buffer, cTemp);
+			printf("TIME:%s    Temperature in Fahrenheit : %.2f F \n",time_buffer, fTemp);
+		}
+		}
 	}
 return 0;
+
 }
 
 

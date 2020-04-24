@@ -87,7 +87,7 @@ int main(int argc, char ** argv)
 */  
 
 //  tcsetattr(fd, TCSANOW, &options);
-  tcsetattr(fd1, TCSAFLUSH, &options);
+  tcsetattr(fd, TCSAFLUSH, &options);
       /* enable input & output transmission */
  //   tcflow(fd, TCOON | TCION);
   // Write to the port

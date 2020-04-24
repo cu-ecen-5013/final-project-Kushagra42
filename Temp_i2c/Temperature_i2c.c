@@ -229,23 +229,23 @@ int main()
 			printf("TIME:%s    Temperature in Fahrenheit : %.2f F \n",time_buffer, fTemp);
 		}
   	printf("\nstarting uart\n");
-    char tx_buffer1[20]="helloo";
+//    char tx_buffer1[20]="helloo";
 
  
 //    sprintf(tx_buffer1, "%f",cTemp);
-    int return_uart=uart(tx_buffer1);
-    if(return_uart==0)
-	{
-		printf("Uart successful\n");
-//		return 0;
+//    int return_uart=uart(tx_buffer1);
+//     if(return_uart==0)
+// 	{
+// 		printf("Uart successful\n");
+// //		return 0;
 
-	}
-   else 
-	{
-		printf("Uart error");
-		return -1;
+// 	}
+//    else 
+// 	{
+// 		printf("Uart error");
+// 		return -1;
 
-	}
+// 	}
 		}
 	}
 return 0;

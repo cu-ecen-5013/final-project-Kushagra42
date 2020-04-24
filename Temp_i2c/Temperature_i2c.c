@@ -126,7 +126,7 @@ int uart(char tx_buffer[20])
 //  *p_tx_buffer++ = 'o';
 //size_t count = strlen(tx_buffer);
 //  int n = write("Hi testing uart functionality for raspi\n");
-  int n = write(fd, &tx_buffer, 11);		//Filestream, bytes to write, number of bytes to write
+  int n = write(fd, &tx_buffer, 7);		//Filestream, bytes to write, number of bytes to write
 //  int n = write(fd,&tx_buffer[0],(p_tx_buffer - &tx_buffer[0]));
   if (n < 0) 
   {

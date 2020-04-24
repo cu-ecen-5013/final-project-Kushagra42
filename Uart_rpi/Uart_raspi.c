@@ -26,13 +26,13 @@ int main(int argc, char ** argv)
   struct termios options;
   tcgetattr(fd, &options);
 
-    int baud_in=cfsetispeed(&options, B115200);
+    int baud_in=cfsetispeed(&options, B9600);
   if (baud_in == -1)
   {
     perror("Error in setting input required baud rate\n ");
     return(-1);
   }
-  int baud_out=cfsetospeed(&options, B115200);
+  int baud_out=cfsetospeed(&options, B9600);
   if (baud_out==-1)
   {
     perror("Error in setting output required baud rate\n ");
@@ -86,9 +86,10 @@ int main(int argc, char ** argv)
   }
 */  
 
-  tcsetattr(fd, TCSANOW, &options);
+//  tcsetattr(fd, TCSANOW, &options);
+  tcsetattr(fd1, TCSAFLUSH, &options);
       /* enable input & output transmission */
-    tcflow(fd, TCOON | TCION);
+ //   tcflow(fd, TCOON | TCION);
   // Write to the port
   unsigned char tx_buffer[20]= "Hello Aesd";
 //  unsigned char *p_tx_buffer;

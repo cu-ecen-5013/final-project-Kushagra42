@@ -12,7 +12,7 @@ ifeq ($(LDFLAGS),)
 endif
 
 #Recipe to compile writer.c
-all:Client_OP Server_OP Hello_OP Uart_write_OP Uart_read_OP Temperature_i2c_OP Uart_raspi_OP Uart_readwrite_OP
+all:Client_OP Server_OP Hello_OP Uart_write_OP Uart_read_OP Temperature_i2c_OP Uart_raspi_OP Uart_readwrite_OP Si7021_OP
 
 Temperature_i2c_OP:./Temp_i2c/Temperature_i2c
 	$(CC) $(CFLAGS) -o Temperature_i2c ./Temp_i2c/Temperature_i2c.c
@@ -38,7 +38,10 @@ Uart_read_OP:./UART_Communication/uart_read
 Uart_readwrite_OP:./UART_Communication/uart_ReadWrite
 	$(CC) $(CFLAGS) -o uart_ReadWrite ./UART_Communication/uart_ReadWrite.c
 
+Si7021_OP:./I2C_TEMP_BB/Si7021
+	$(CC) $(CFLAGS) -o Si7021 ./I2C_TEMP_BB/Si7021.c
+
 #cleaning all the executable files
 clean:
-	rm -f *.o Client Server Hello uart_write uart_read Temperature_i2c uart_ReadWrite
+	rm -f *.o Client Server Hello uart_write uart_read Temperature_i2c Si7021
 

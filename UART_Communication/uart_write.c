@@ -5,7 +5,9 @@
 #include<unistd.h>
 #include<termios.h>   // using the termios.h library
 
-int main(){
+int main()
+	{
+
 	int file, count;
 
 	if ((file = open("/dev/ttyO4", O_RDWR | O_NOCTTY | O_NDELAY))<0)

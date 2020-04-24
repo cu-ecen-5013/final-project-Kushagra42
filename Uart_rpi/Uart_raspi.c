@@ -26,6 +26,18 @@ int main(int argc, char ** argv)
   struct termios options;
   tcgetattr(fd, &options);
 
+    int baud_in=cfsetispeed(&options, B115200);
+  if (baud_in == -1)
+  {
+    perror("Error in setting input required baud rate\n ");
+    return(-1);
+  }
+  int baud_out=cfsetospeed(&options, B115200);
+  if (baud_out==-1)
+  {
+    perror("Error in setting output required baud rate\n ");
+    return(-1);
+  }
       /* input flags */
     options.c_iflag &= ~ IGNBRK;                       /* enable ignoring break */
     options.c_iflag &= ~(IGNPAR | PARMRK);             /* disable parity checks */
@@ -47,6 +59,8 @@ int main(int argc, char ** argv)
     options.c_cflag  &= ~ CSIZE;                        /* remove size flag... */
     options.c_cflag  |=   CS8;                          /* ...enable 8 bit characters */
     options.c_cflag  |=   HUPCL;                        /* enable lower control lines on close - hang up */
+    options.c_cflag &= ~CRTSCTS;	
+
         /* local flags */
     options.c_lflag &= ~ ISIG;                         /* disable generating signals */
     options.c_lflag &= ~ ICANON;                       /* disable canonical mode - line by line */
@@ -57,6 +71,7 @@ int main(int argc, char ** argv)
 
         /* control characters */
     memset(options.c_cc,0,sizeof(options.c_cc));
+/*
   int baud_in=cfsetispeed(&options, B115200);
   if (baud_in == -1)
   {
@@ -68,9 +83,12 @@ int main(int argc, char ** argv)
   {
     perror("Error in setting output required baud rate\n ");
     return(-1);
-  }  
+  }
+*/  
 
   tcsetattr(fd, TCSANOW, &options);
+      /* enable input & output transmission */
+    tcflow(fd, TCOON | TCION);
   // Write to the port
   unsigned char tx_buffer[20]= "Hello Aesd";
 //  unsigned char *p_tx_buffer;
@@ -81,6 +99,7 @@ int main(int argc, char ** argv)
 //  *p_tx_buffer++ = 'l';
 //  *p_tx_buffer++ = 'l';
 //  *p_tx_buffer++ = 'o';
+//size_t count = strlen(tx_buffer);
 //  int n = write("Hi testing uart functionality for raspi\n");
   int n = write(fd, &tx_buffer, 11);		//Filestream, bytes to write, number of bytes to write
 //  int n = write(fd,&tx_buffer[0],(p_tx_buffer - &tx_buffer[0]));
@@ -93,18 +112,18 @@ int main(int argc, char ** argv)
   usleep(10000);
   // Read up to 255 characters from the port if they are there
   char buf[256];
-  n = read(fd, (void*)buf, 11);
-  if (n < 0) 
+  int r= read(fd, (void*)buf, n);
+  if (r < 0) 
   {
     perror("Read failure ");
     return -1;
   }
-  else if (n == 0) 
+  else if (r == 0) 
 	printf("No data on port\n");
   else 
   {
-    buf[n] = '\0';
-    printf("%i bytes read : %s\n", n, buf);
+    buf[r] = '\0';
+    printf("%i bytes read : %s\n", r, buf);
   }
 
   // Don't forget to clean up

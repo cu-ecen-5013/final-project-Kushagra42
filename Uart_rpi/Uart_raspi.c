@@ -287,7 +287,7 @@ int main(void)
 {
     int fd1, count;
     struct termios options;
-    char tx[20] = "Hello TM4C123GXL", rx[20];
+    unsigned char tx[20] = "Hello", rx[20];
 
     printf("Testing uart implementation");
 
@@ -296,14 +296,14 @@ int main(void)
         perror("open\n");
         return -1;
     }
-
+//    fcntl(fd, F_SETFL, 0);
     tcgetattr(fd1, &options);
-    if((cfsetispeed(&options, B4800)) == -1)
+    if((cfsetispeed(&options, B115200)) == -1)
     {
         perror("Input baud rate\n");
         return -1;
     }
-    if((cfsetospeed(&options, B4800)) == -1)
+    if((cfsetospeed(&options, B115200)) == -1)
     {
         perror("Output baud rate\n");
         return -1;
@@ -313,26 +313,32 @@ int main(void)
     options.c_iflag &= ~(ISTRIP | IXON | INLCR | PARMRK | ICRNL | IGNBRK);
     options.c_oflag = 0;
     options.c_lflag = 0;
-
-    tcsetattr(fd1, TCSAFLUSH, &options);
-
+    tcflush(fd1,TCIFLUSH);
+    tcsetattr(fd1, TCSANOW, &options);
+    printf("Receive characters\n");
+    fcntl(fd1, F_SETFL, 0);
+    if ((count = read(fd1, (void*)rx, 1000)) < 0)
+    {
+        perror("read\n");
+        return -1;
+    }
     printf("Sending: '%s'\n", tx);
-    if ((count = write(fd1, &tx, 17)) < 0)
+    if ((count = write(fd1, &tx, 6)) < 0)
     {
         perror("write\n");
         return -1;
     }
 
-    usleep(100000);
-
+    usleep(1000000);
+/*
     printf("Receive characters\n");
 
-    if ((count = read(fd1, (void*)rx, 17)) < 0)
+    if ((count = read(fd1, (void*)rx, 100)) < 0)
     {
         perror("read\n");
         return -1;
     }
-
+*/
     if(count)
     {
         printf("Received-> %s, %d chars", rx, count);

@@ -7,12 +7,12 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <termios.h>
-#include "Uart_raspi.h"
+//#include "Uart_raspi.h"
 //#include "../Temp_i2c/Temperature_i2c.h"
 
 //int main(int argc, char ** argv) 
-/*
-int uart(char tx_buffer[20])
+
+int main()
 {
   int fd;
   // Open the Port. We want read/write, no "controlling tty" status, and open it no matter what state DCD is in
@@ -95,7 +95,7 @@ int uart(char tx_buffer[20])
       /* enable input & output transmission */
  //   tcflow(fd, TCOON | TCION);
   // Write to the port
-//  unsigned char tx_buffer[20]= "Hello Aesd";
+  unsigned char tx_buffer[20]= "Hello Aesd";
 //  unsigned char *p_tx_buffer;
   printf("Testing uart ");	
 //  p_tx_buffer = &tx_buffer[0];
@@ -137,4 +137,4 @@ int uart(char tx_buffer[20])
   return 0;
 //  return 0;
 }
-*/
+

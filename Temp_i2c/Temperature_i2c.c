@@ -228,7 +228,7 @@ int main()
 			printf("TIME:%s    Temperature in Celsius : %.2f C \n",time_buffer, cTemp);
 			printf("TIME:%s    Temperature in Fahrenheit : %.2f F \n",time_buffer, fTemp);
 		}
-  
+  	printf("\nstarting uart\n");
     char tx_buffer1[20]="helloo";
 
  

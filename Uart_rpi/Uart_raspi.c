@@ -287,7 +287,7 @@ int main(void)
 {
     int fd1, count;
     struct termios options;
-    char tx[20] = "Hello TM4C123GXL", rx[20];
+    unsigned char tx[20] = "Hello TM4C123GXL", rx[20];
 
     printf("Testing uart implementation");
 
@@ -298,12 +298,12 @@ int main(void)
     }
 
     tcgetattr(fd1, &options);
-    if((cfsetispeed(&options, B4800)) == -1)
+    if((cfsetispeed(&options, B9600)) == -1)
     {
         perror("Input baud rate\n");
         return -1;
     }
-    if((cfsetospeed(&options, B4800)) == -1)
+    if((cfsetospeed(&options, B9600)) == -1)
     {
         perror("Output baud rate\n");
         return -1;
@@ -327,7 +327,7 @@ int main(void)
 
     printf("Receive characters\n");
 
-    if ((count = read(fd1, (void*)rx, 17)) < 0)
+    if ((count = read(fd1, (void*)rx, 100)) < 0)
     {
         perror("read\n");
         return -1;

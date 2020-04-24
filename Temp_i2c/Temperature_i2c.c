@@ -337,8 +337,8 @@ int main()
     unsigned char tx_buffer1[20]="helloo";
     usleep(1000000);
 //    sprintf(tx_buffer1, "%f",cTemp);
-    int return_uart_write=uart_write(tx_buffer1);
-    if(return_uart_write==0)
+   uart_write(tx_buffer1);
+/*    if(return_uart_write==0)
 	{
 		printf("Uart successful\n");
 
@@ -350,7 +350,7 @@ int main()
 		return -1;
 
 	}
-		
+*/		
 	}
 return 0;
 

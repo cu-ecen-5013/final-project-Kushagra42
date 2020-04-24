@@ -38,7 +38,7 @@ int main(){
 /*****DATA Reading operation*****************************************************/
    fcntl(file, F_SETFL, 0);
    unsigned char receive[BUFFER_SIZE];      //declare a buffer for receiving data
-   if ((count = read(file, (void*)receive, 100))<0){   //receive the data
+   if ((count = read(file, (void*)receive, 100))<0){   //receive the datam
       perror("Failed to read from the input\n");
       return -1;
    }

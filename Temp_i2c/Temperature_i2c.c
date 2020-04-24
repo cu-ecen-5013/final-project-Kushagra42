@@ -18,7 +18,7 @@
 #include <sys/stat.h>
 #include <time.h>
 //#include "Uart_raspi.h"
-
+#define BUFFER_SIZE 100 
 
 #include <string.h>
 #include <unistd.h>
@@ -32,7 +32,7 @@ int beaglebone=1;
 float cTemp;
 
 
-int uart(char tx_buffer[20])
+int uart_write_1(char tx_buffer[20])
 {
   int fd;
   // Open the Port. We want read/write, no "controlling tty" status, and open it no matter what state DCD is in
@@ -159,6 +159,90 @@ int uart(char tx_buffer[20])
 }
 
 
+int uart_write(unsigned char tx_buffer[20])
+{
+  int file, count;
+
+	if ((file = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY | O_NDELAY))<0)
+	{
+	     printf("UART: Failed to open the file.\n");
+	     return -1;
+	}
+   	struct termios options;               //The termios structure is vital
+   	tcgetattr(file, &options);            //Sets the parameters associated with file
+
+   	// Set up the communications options:
+   	//   115200 baud, 8-bit, enable receiver, no modem control lines
+   	options.c_cflag = B115200 | CS8 | CREAD | CLOCAL;
+  	options.c_iflag = IGNPAR | ICRNL;    //ignore partity errors, CR -> newline
+   	tcflush(file, TCIFLUSH);             //discard file information not transmitted
+   	tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
+	
+//	unsigned char transmit[] = "1";  //the string to send
+
+   	if ((count = write(file, &tx_buffer,6)<0))
+	  {
+	        //send the string
+      		printf("Failed to write to the output\n");
+      		return -1;
+   	}
+	printf("Write successful\n");
+   	
+//	usleep(1000000);    
+	close(file);
+	return 0;  
+}
+int uart_read()
+{
+  int file,count;
+/********************************************open file**********************************/
+   if ((file = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY | O_NDELAY))<0){
+      perror("UART: Failed to open the file.\n");
+      return -1;
+   }
+   struct termios options;               //The termios structure is vital
+   tcgetattr(file, &options);            //Sets the parameters associated with file
+
+   // Set up the communications options:
+   //   115200 baud, 8-bit, enable receiver, no modem control lines
+   options.c_cflag = B115200 | CS8 | CREAD | CLOCAL;
+   options.c_iflag = IGNPAR | ICRNL; 
+   options.c_oflag = 0;
+   options.c_lflag = 0;
+   //ignore partity errors, CR -> newline
+   tcflush(file, TCIFLUSH);             //discard file information not transmitted
+   tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
+
+   //unsigned char transmit[18] = "Hello BeagleBone!";  //the string to send
+
+/****************Sending command to arduino********************************************/
+   //if ((count = write(file, &transmit,18))<0){        //send the string
+      //perror("Failed to write to the output\n");
+     // return -1;
+   //}
+
+/*****DATA Reading operation*****************************************************/
+   fcntl(file, F_SETFL, 0);
+   unsigned char receive[BUFFER_SIZE];      //declare a buffer for receiving data
+   if ((count = read(file, (void*)receive, 100))<0){   //receive the datam
+      perror("Failed to read from the input\n");
+      return -1;
+   }
+   if (count==0)
+   { 
+        printf("There was no data available to read!\n");
+        return 0;
+    } 
+   else {
+     
+      printf("The following sensor value was read in [%d]: %s\n",count,receive);
+      close(file);
+      return 1;
+   }
+ 
+  
+}
+
 int main()
 {
 	
@@ -177,7 +261,7 @@ int main()
 	ioctl(file, I2C_SLAVE, Si7021_address);
 
 	// Send humidity measurement command, NO HOLD MASTER(0xF5)
-	char config[1] = {0xF5};
+	char config[1] = {0xF3};
 	write(file, config, 1);
 	sleep(1);
 
@@ -186,31 +270,51 @@ int main()
 	
 	while(1)
 	{
-		if(beaglebone==1)
-		{
-		char data[2] = {0};
-		if(read(file, data, 2) != 2)
-		{
-			printf("Error : Input/Output error \n");
-		}
-		else
-		{
-			// Convert the data
-			float humidity = (((data[0] * 256 + data[1]) * 125.0) / 65536.0) - 6;
+    // unsigned char return_uart_read=uart_read(tx_buffer1);
 
-			// Output data to screen
-			printf("Relative Humidity : %.2f RH \n", humidity);
-		}
+    // while(return_uart_read!="1")
+    // {
+    //    return_uart_read=uart_read(tx_buffer1);
+    // }
+		// char data[2] = {0};
+		// if(read(file, data, 2) != 2)
+		// {
+		// 	printf("Error : Input/Output error \n");
+		// }
+		// else
+		// {
+		// 	// Convert the data
+		// 	float humidity = (((data[0] * 256 + data[1]) * 125.0) / 65536.0) - 6;
+
+		// 	// Output data to screen
+		// 	printf("Relative Humidity : %.2f RH \n", humidity);
+		// }
 
 		// Send temperature measurement command, NO HOLD MASTER(0xF3)
-		config[0] = 0xF3;
-		write(file, config, 1); 
-		sleep(1);
+	//	config[0] = 0xF3;
+	//	write(file, config, 1); 
+	//	sleep(1);
 
 		// Read 2 bytes of temperature data
 		// temp msb, temp lsb
+    printf("\nstarting uart read \n");
+    int return_uart_read=uart_read();
+
+    while(return_uart_read!=1)
+    {
+       return_uart_read=uart_read();
+    }
+    printf("REading data \n");
+		char data[2] = {0};
+  
+//    char tx_buffer1[20]="helloo";
 		if(read(file, data, 2) != 2)
 		{
+      time( &time_current );
+	
+			local = localtime( &time_current );
+	
+			time_buffer = asctime(local);
 			printf("TIME:%s    Error : Input/Output error \n",time_buffer);
 		}
 		else
@@ -229,24 +333,24 @@ int main()
 			printf("TIME:%s    Temperature in Fahrenheit : %.2f F \n",time_buffer, fTemp);
 		}
   	printf("\nstarting uart\n");
-//    char tx_buffer1[20]="helloo";
-
+    
+    unsigned char tx_buffer1[20]="helloo";
  
 //    sprintf(tx_buffer1, "%f",cTemp);
-//    int return_uart=uart(tx_buffer1);
-//     if(return_uart==0)
-// 	{
-// 		printf("Uart successful\n");
-// //		return 0;
+    int return_uart_write=uart_write(tx_buffer1);
+    if(return_uart_write==0)
+	{
+		printf("Uart successful\n");
 
-// 	}
-//    else 
-// 	{
-// 		printf("Uart error");
-// 		return -1;
 
-// 	}
-		}
+	}
+   else 
+	{
+		printf("Uart error");
+		return -1;
+
+	}
+		
 	}
 return 0;
 

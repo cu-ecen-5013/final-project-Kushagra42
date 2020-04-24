@@ -229,14 +229,14 @@ int main()
 			printf("TIME:%s    Temperature in Fahrenheit : %.2f F \n",time_buffer, fTemp);
 		}
   
-    char tx_buffer1[20];
+    char tx_buffer1[20]="helloo";
 
  
-    sprintf(tx_buffer1, "%f",cTemp);
+//    sprintf(tx_buffer1, "%f",cTemp);
     int return_uart=uart(tx_buffer1);
     if(return_uart==0)
 	{
-		printf("Uart successful");
+		printf("Uart successful\n");
 //		return 0;
 
 	}

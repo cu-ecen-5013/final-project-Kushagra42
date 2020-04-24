@@ -237,7 +237,7 @@ int main()
     if(return_uart==0)
 	{
 		printf("Uart successful");
-		return 0;
+//		return 0;
 
 	}
    else 

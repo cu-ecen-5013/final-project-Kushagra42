@@ -19,7 +19,7 @@ int main(){
 
    // Set up the communications options:
    //   9600 baud, 8-bit, enable receiver, no modem control lines
-   options.c_cflag = B115200 | CS8 | CREAD | CLOCAL;
+   options.c_cflag = B9600 | CS8 | CREAD | CLOCAL;
    options.c_iflag = IGNPAR | ICRNL; 
    options.c_oflag = 0;
    options.c_lflag = 0;
@@ -37,7 +37,7 @@ int main(){
 
 /*****DATA Reading operation*****************************************************/
    fcntl(file, F_SETFL, 0);
-   unsigned int receive[BUFFER_SIZE];      //declare a buffer for receiving data
+   unsigned char receive[BUFFER_SIZE];      //declare a buffer for receiving data
    if ((count = read(file, (void*)receive, 100))<0){   //receive the data
       perror("Failed to read from the input\n");
       return -1;

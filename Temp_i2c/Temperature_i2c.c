@@ -297,13 +297,13 @@ int main()
 
 		// Read 2 bytes of temperature data
 		// temp msb, temp lsb
-    printf("\nstarting uart read \n");
-    int return_uart_read=uart_read();
+//    printf("\nstarting uart read \n");
+//    int return_uart_read=uart_read();
 
-    while(return_uart_read!=1)
-    {
-       return_uart_read=uart_read();
-    }
+//    while(return_uart_read!=1)
+//    {
+//       return_uart_read=uart_read();
+//    }
     printf("REading data \n");
 		char data[2] = {0};
   

@@ -2,6 +2,7 @@
 
 
 #include<stdio.h>
+#include<stdlib.h>
 #include<fcntl.h>
 #include<unistd.h>
 #include<termios.h>   // using the termios.h library
@@ -9,6 +10,10 @@
 #define BUFFER_SIZE 100
 int main(){
    int file, count;
+   int store_int;
+   float ARD_Temp;
+	  
+   
 /********************************************open file**********************************/
    if ((file = open("/dev/ttyO4", O_RDWR | O_NOCTTY | O_NDELAY))<0){
       perror("UART: Failed to open the file.\n");
@@ -27,7 +32,7 @@ int main(){
    tcflush(file, TCIFLUSH);             //discard file information not transmitted
    tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
 
-   unsigned char transmit[18] = "Hello BeagleBone!";  //the string to send
+   unsigned char transmit[18] = "1";  //the string to send
 
 /****************Sending command to arduino********************************************/
    if ((count = write(file, &transmit,18))<0){        //send the string
@@ -37,7 +42,7 @@ int main(){
 
 /*****DATA Reading operation*****************************************************/
    fcntl(file, F_SETFL, 0);
-   unsigned char receive[BUFFER_SIZE];      //declare a buffer for receiving data
+   char receive[BUFFER_SIZE];      //declare a buffer for receiving data
    if ((count = read(file, (void*)receive, 100))<0){   //receive the data
       perror("Failed to read from the input\n");
       return -1;
@@ -46,6 +51,12 @@ int main(){
    else {
       printf("The following sensor value was read in [%d]: %s\n",count,receive);
    }
+   
+	store_int = atoi(receive);
+   	printf("converetd integer value is:%d\n",store_int);
+	ARD_Temp = store_int/100.00;
+	printf("Temperature is:%.2f\n",ARD_Temp);
+	
    close(file);
    return 0;
 }

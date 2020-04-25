@@ -27,13 +27,6 @@ int main(){
    tcflush(file, TCIFLUSH);             //discard file information not transmitted
    tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
 
-   //unsigned char transmit[18] = "Hello BeagleBone!";  //the string to send
-
-/****************Sending command to arduino********************************************/
-   //if ((count = write(file, &transmit,18))<0){        //send the string
-      //perror("Failed to write to the output\n");
-     // return -1;
-   //}
 
 /*****DATA Reading operation*****************************************************/
    fcntl(file, F_SETFL, 0);

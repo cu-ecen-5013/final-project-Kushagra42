@@ -5,7 +5,10 @@ SoftwareSerial mySerial(2, 3); // RX, TX
 char inChar;
 const int temperaturePin = 0;
 float result;
-String send_temp;
+//String send_temp;
+int value;
+int send_temp;
+char conv[20]= {0};
 
 void setup()
 {
@@ -15,7 +18,7 @@ void setup()
  while (!Serial) {
     ; // wait for serial port to connect. Needed for Native USB only
   }
-  Serial.println("Awaiting command from BBB...");
+  //Serial.println("Awaiting command from BBB...");
   // set the data rate for the SoftwareSerial port
   mySerial.begin(115200);
   pinMode(13, OUTPUT);
@@ -44,22 +47,35 @@ float getVoltage(int pin)
 
 void loop() // run over and over
 {
-  if (mySerial.available()){
-    Serial.write(mySerial.read());
-    delay(10);
-    inChar = (char)mySerial.read();
-    if(inChar=='1'){
-      Serial.print("Received read and transmit instructions from BBB ");
-      digitalWrite(13, HIGH);
-//      result = 66.5;//temp_read();
-//      send_temp = String(result);
-      mySerial.write(temp_read());
-      delay(20);
-     }else if(inChar =='0'){
-      Serial.print("Awaitng read and transmit instruction from BBB");    
-      digitalWrite(13, LOW);
-    }else{
-      Serial.print("Unknown instructions ");    
-   }
-  }
+  //Serial.print(temp_read());
+  if (mySerial.available())
+    {
+       // Serial.write(mySerial.read());
+       delay(10);
+       inChar = mySerial.read();
+  
+      if(inChar== '1')
+        {
+             Serial.print("Received read and transmit instructions from BBB ");
+             digitalWrite(13, HIGH);
+
+             float f_temp = temp_read();
+             send_temp = (f_temp * 100);
+             itoa(send_temp,conv,10);
+
+             for(int i = 0; i<3; i++)
+              {
+                 mySerial.write(conv[i]); 
+              }
+      
+              Serial.print(send_temp);
+      
+              delay(20);
+        }
+      else if(value == '0')
+        {
+             Serial.print("Awaitng read and transmit instruction from BBB");    
+              digitalWrite(13, LOW);   
+        }
+    }
 }

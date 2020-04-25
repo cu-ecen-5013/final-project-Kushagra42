@@ -78,7 +78,7 @@
   int store_int;
    float Rasp_Temp;
 /********************************************open file**********************************/
-   if ((file = open("/dev/ttyO0", O_RDWR | O_NOCTTY | O_NDELAY))<0){
+   if ((file = open("/dev/ttyO5", O_RDWR | O_NOCTTY | O_NDELAY))<0){
       perror("UART: Failed to open the file.\n");
       return -1;
    }

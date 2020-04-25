@@ -66,9 +66,10 @@
  int Rasp_uart()
 {
    int file, count;
-  
+  int store_int;
+   float Rasp_Temp;
 /********************************************open file**********************************/
-   if ((file = open("/dev/ttyO5", O_RDWR | O_NOCTTY | O_NDELAY))<0){
+   if ((file = open("/dev/ttyO2", O_RDWR | O_NOCTTY | O_NDELAY))<0){
       perror("UART: Failed to open the file.\n");
       return -1;
    }
@@ -104,6 +105,11 @@
    else {
       printf("The following sensor value was read in [%d]: %s\n",count,receive);
    }
+
+   	store_int = atoi(receive);
+   	printf("converetd integer value is:%d\n",store_int);
+	Rasp_Temp = store_int/100.00;
+	printf("Temperature is:%.2f\n",Rasp_Temp);
    close(file);
    return 0;
 }
@@ -113,9 +119,9 @@ int main()
 		 
 	printf("Sending command 1 to BB and Arduino\n");
 	float Temperature1=ARD_uart();
-   	Rasp_uart();
-	//printf("Temperature Value from Raspi is: %s\n", store_Rasp_buff);
+ 	float Temperature2=Rasp_uart();
+   	
 	printf("Temperature value from Arduino is: %f\n", Temperature1); 
-	
+	printf("Temperature Value from Raspi is: %f\n", Temperature2);
 
 }

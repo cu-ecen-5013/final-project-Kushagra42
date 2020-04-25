@@ -291,7 +291,7 @@ int main(void)
 
     printf("Testing uart implementation");
 
-    if ((fd1 = open("/dev/serial0", O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
+    if ((fd1 = open("/dev/ttyS0", O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
     {
         perror("open\n");
         return -1;

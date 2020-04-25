@@ -21,10 +21,10 @@ Uart_raspi_OP:./Uart_rpi/Uart_raspi
 	$(CC) $(CFLAGS) -o Uart_raspi ./Uart_rpi/Uart_raspi.c
 
 Client_OP:./Socket_Client/Client
-	$(CC) $(CFLAGS) -o Client ./Socket_Client/Client.c
+	$(CC) $(CFLAGS) -o Client ./Socket_Client/Client.c $(LDFLAGS) $(INCLUDES)
 	
 Server_OP:./Socket_Server/Server
-	$(CC) $(CFLAGS) -o Server ./Socket_Server/Server.c
+	$(CC) $(CFLAGS) -o Server ./Socket_Server/Server.c $(LDFLAGS) $(INCLUDES)
 
 Hello_OP: Hello
 	$(CC) $(CFLAGS) -o Hello Hello.c
@@ -46,5 +46,5 @@ Uart_Rasp_ARD_WR_OP:./UART_Communication/uart_Rasp_ARD_WR
 
 #cleaning all the executable files
 clean:
-	rm -f *.o Client Server Hello uart_write uart_read Temperature_i2c Si7021 uart_Rasp_ARD_WR ./UART_Communication/uart_Rasp_ARD_WR ./UART_Communication/uart_ReadWrite ./UART_Communication/uart_write ./UART_Communication/uart_read
+	rm -f *.o Client Server Hello uart_write uart_read Temperature_i2c Si7021 uart_Rasp_ARD_WR ./UART_Communication/uart_Rasp_ARD_WR ./UART_Communication/uart_ReadWrite ./UART_Communication/uart_write ./UART_Communication/uart_read ./Socket_Server/Server ./Socket_Client/Client
 

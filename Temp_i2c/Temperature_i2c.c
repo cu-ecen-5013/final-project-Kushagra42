@@ -202,7 +202,7 @@ int uart_read()
 {
   int file,count;
 /********************************************open file**********************************/
-   if ((file = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY | O_NDELAY))<0){
+   if ((file = open("/dev/serial0", O_RDWR | O_NOCTTY | O_NDELAY))<0){
       perror("UART: Failed to open the file.\n");
       return -1;
    }

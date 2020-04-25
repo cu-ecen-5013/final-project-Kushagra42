@@ -1,69 +1,69 @@
-#include <netdb.h> 
 #include <stdio.h> 
-#include <stdlib.h> 
-#include <string.h> 
-#include <sys/socket.h> 
-#include <unistd.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#define MAX_SIZE 80 
-#define PORT 9000 
-#define SA struct sockaddr 
+    #include <stdlib.h> 
+    #include <errno.h> 
+    #include <string.h> 
+    #include <netdb.h> 
+    #include <sys/types.h> 
+    #include <netinet/in.h> 
+    #include <sys/socket.h> 
+    #include <unistd.h>
 
-void Write_Buff(int sockfd) 
-{ 
-    char buff[MAX_SIZE]; 
-    int n; 
-    for (;;) { 
-        bzero(buff, sizeof(buff)); 
-        printf("Write Data: "); 
-        n = 0; 
-        while ((buff[n++] = getchar()) != '\n') 
-            ; 
-        write(sockfd, buff, sizeof(buff)); 
-        bzero(buff, sizeof(buff)); 
-        read(sockfd, buff, sizeof(buff)); 
-        printf("Data from Server : %s", buff); 
-        if ((strncmp(buff, "exit", 4)) == 0) { 
-            printf("Client disconnected...\n"); 
-            break; 
-        } 
-    } 
-} 
-  
-int main() 
-{ 
-    int sockfd; 
-    struct sockaddr_in servaddr; 
-  
-    
-    sockfd = socket(AF_INET, SOCK_STREAM, 0); 
-    if (sockfd == -1) { 
-        printf("Socket connection failed\n"); 
-        exit(0); 
-    } 
-    else
+    #define PORT 9000    /* the port client will be connecting to */
+
+    #define MAXDATASIZE 100 /* max number of bytes we can get at once */
+
+    int main(int argc, char *argv[])
     {
-        printf("Socket Connection Established\n"); 
-        bzero(&servaddr, sizeof(servaddr)); 
-    }
-   
-    servaddr.sin_family = AF_INET; 
-    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
-    servaddr.sin_port = htons(PORT); 
-  
-    
-    if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) { 
-        printf("connection with the server failed...\n"); 
-        exit(0); 
-    } 
-    else
-        printf("connected to the server..\n"); 
-  
-    
-    Write_Buff(sockfd); 
-  
-   
-    close(sockfd); 
-} 
+        int sockfd, numbytes;  
+        char buf[MAXDATASIZE];
+        struct hostent *he;
+        struct sockaddr_in their_addr; /* connector's address information */
 
+        if (argc != 2) {
+            fprintf(stderr,"usage: client hostname\n");
+            exit(1);
+        }
+
+        if ((he=gethostbyname(argv[1])) == NULL) {  /* get the host info */
+            herror("gethostbyname");
+            exit(1);
+        }
+
+        if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+            perror("socket");
+            exit(1);
+        }
+
+        their_addr.sin_family = AF_INET;      /* host byte order */
+        their_addr.sin_port = htons(PORT);    /* short, network byte order */
+        their_addr.sin_addr = *((struct in_addr *)he->h_addr);
+        bzero(&(their_addr.sin_zero), 8);     /* zero the rest of the struct */
+
+        if (connect(sockfd, (struct sockaddr *)&their_addr, \
+                                              sizeof(struct sockaddr)) == -1) {
+            perror("connect");
+            exit(1);
+        }
+	while (1) {
+		if (send(sockfd, "Hello, world!\n", 14, 0) == -1){
+                      perror("send");
+		      exit (1);
+		}
+		printf("After the send function \n");
+
+        	if ((numbytes=recv(sockfd, buf, MAXDATASIZE, 0)) == -1) {
+            		perror("recv");
+            		exit(1);
+		}	
+
+	        buf[numbytes] = '\0';
+
+        	printf("Received in pid=%d, text=: %s \n",getpid(), buf);
+		sleep(1);
+
+	}
+
+        close(sockfd);
+
+        return 0;
+    }

@@ -8,7 +8,7 @@
 
 #define BUFFER_SIZE 100
 int main(){
-   int file,count;
+   int file, count;
 /********************************************open file**********************************/
    if ((file = open("/dev/ttyO4", O_RDWR | O_NOCTTY | O_NDELAY))<0){
       perror("UART: Failed to open the file.\n");
@@ -27,18 +27,18 @@ int main(){
    tcflush(file, TCIFLUSH);             //discard file information not transmitted
    tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
 
-   //unsigned char transmit[18] = "Hello BeagleBone!";  //the string to send
+   unsigned char transmit[18] = "Hello BeagleBone!";  //the string to send
 
 /****************Sending command to arduino********************************************/
-   //if ((count = write(file, &transmit,18))<0){        //send the string
-      //perror("Failed to write to the output\n");
-     // return -1;
-   //}
+   if ((count = write(file, &transmit,18))<0){        //send the string
+      perror("Failed to write to the output\n");
+      return -1;
+   }
 
 /*****DATA Reading operation*****************************************************/
    fcntl(file, F_SETFL, 0);
    unsigned char receive[BUFFER_SIZE];      //declare a buffer for receiving data
-   if ((count = read(file, (void*)receive, 100))<0){   //receive the datam
+   if ((count = read(file, (void*)receive, 100))<0){   //receive the data
       perror("Failed to read from the input\n");
       return -1;
    }

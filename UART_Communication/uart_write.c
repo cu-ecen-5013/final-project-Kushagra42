@@ -5,7 +5,9 @@
 #include<unistd.h>
 #include<termios.h>   // using the termios.h library
 
-int main(){
+int main()
+	{
+
 	int file, count;
 
 	if ((file = open("/dev/ttyO4", O_RDWR | O_NOCTTY | O_NDELAY))<0)
@@ -23,7 +25,7 @@ int main(){
    	tcflush(file, TCIFLUSH);             //discard file information not transmitted
    	tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
 	
-	unsigned char transmit[] = " Hello Arduino this is Beaglebone";  //the string to send
+	unsigned char transmit[] = "1";  //the string to send
 
    	if ((count = write(file, &transmit,sizeof(transmit)))<0)
 	{

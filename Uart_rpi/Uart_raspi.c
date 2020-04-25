@@ -291,7 +291,7 @@ int main(void)
 
     printf("Testing uart implementation");
 
-    if ((fd1 = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
+    if ((fd1 = open("/dev/serial0", O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
     {
         perror("open\n");
         return -1;
@@ -315,13 +315,7 @@ int main(void)
     options.c_lflag = 0;
     tcflush(fd1,TCIFLUSH);
     tcsetattr(fd1, TCSANOW, &options);
-    printf("Receive characters\n");
-    fcntl(fd1, F_SETFL, 0);
-    if ((count = read(fd1, (void*)rx, 1000)) < 0)
-    {
-        perror("read\n");
-        return -1;
-    }
+
     printf("Sending: '%s'\n", tx);
     if ((count = write(fd1, &tx, 6)) < 0)
     {
@@ -329,7 +323,14 @@ int main(void)
         return -1;
     }
 
-    usleep(1000000);
+    usleep(10000);
+    printf("Receive characters\n");
+    fcntl(fd1, F_SETFL, 0);
+    if ((count = read(fd1, (void*)rx, 1000)) < 0)
+    {
+        perror("read\n");
+        return -1;
+    }
 /*
     printf("Receive characters\n");
     if ((count = read(fd1, (void*)rx, 100)) < 0)

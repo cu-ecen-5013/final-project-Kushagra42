@@ -169,7 +169,7 @@ int uart_write( char tx_buffer)
 {
   int file, count;
 
-	if ((file = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY | O_NDELAY))<0)
+	if ((file = open("/dev/serial0", O_RDWR | O_NOCTTY | O_NDELAY))<0)
 	{
 	     printf("UART: Failed to open the file.\n");
 	     return -1;

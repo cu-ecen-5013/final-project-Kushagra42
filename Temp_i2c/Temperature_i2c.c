@@ -31,6 +31,12 @@
 int beaglebone=1;
 float cTemp;
 
+char conv[20]= {0};
+
+int send_temp;
+
+
+
 
 int uart_write_1(char tx_buffer[20])
 {
@@ -159,7 +165,7 @@ int uart_write_1(char tx_buffer[20])
 }
 
 
-int uart_write(unsigned char tx_buffer[20])
+int uart_write( char tx_buffer)
 {
   int file, count;
 
@@ -261,9 +267,9 @@ int main()
 	ioctl(file, I2C_SLAVE, Si7021_address);
 
 	// Send humidity measurement command, NO HOLD MASTER(0xF5)
-	char config[1] = {0xF3};
-	write(file, config, 1);
-	sleep(1);
+//	char config[1] = {0xF3};
+//	write(file, config, 1);
+//	sleep(1);
 
 	// Read 2 bytes of humidity data
 	// humidity msb, humidity lsb
@@ -291,9 +297,9 @@ int main()
 		// }
 
 		// Send temperature measurement command, NO HOLD MASTER(0xF3)
-	//	config[0] = 0xF3;
-	//	write(file, config, 1); 
-	//	sleep(1);
+		char config[1] = {0xF3};
+		write(file, config, 1); 
+		sleep(1);
 
 		// Read 2 bytes of temperature data
 		// temp msb, temp lsb
@@ -334,10 +340,19 @@ int main()
 		}
   	printf("\nstarting uart\n");
     
-    unsigned char tx_buffer1[20]="helloo";
-    usleep(1000000);
+ //   unsigned char tx_buffer1[20]="helloo";
+
+    send_temp=cTemp*100;
+ //   itoa(send_temp,conv,10);
+    sprintf(conv,"%d",send_temp);
+//    usleep(1000000);
 //    sprintf(tx_buffer1, "%f",cTemp);
-   uart_write(tx_buffer1);
+
+                for(int i = 0; i<3; i++)
+              {
+                 uart_write(conv[i]); 
+              }
+   
 /*    if(return_uart_write==0)
 	{
 		printf("Uart successful\n");

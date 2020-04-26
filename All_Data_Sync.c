@@ -23,6 +23,10 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/select.h>
+#include <netdb.h> 
+#include <sys/types.h> 
+#include <netinet/in.h> 
+#include <sys/socket.h> 
 
 #define BUFFER_SIZE 100
 #define SLAVE_ADDR 0x76
@@ -41,6 +45,64 @@
 #define SYNC_TIME_S		1
 #define ADDITIONAL_MS	100
 
+#define PORT 9000    /* the port client will be connecting to */
+
+#define MAXDATASIZE 100 /* max number of bytes we can get at once */
+
+int Client_Data(char *str, uint32_t len,int argc,char* argv[])
+{
+
+       int sockfd,numbytes;  
+        char buf[MAXDATASIZE];
+        struct hostent *he;
+        struct sockaddr_in their_addr; /* connector's address information */
+
+        if (argc != 2) {
+            fprintf(stderr,"usage: client hostname\n");
+            exit(1);
+        }
+
+        if ((he=gethostbyname(argv[1])) == NULL) {  /* get the host info */
+            herror("gethostbyname");
+            exit(1);
+        }
+
+        if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+            perror("socket");
+            exit(1);
+        }
+
+        their_addr.sin_family = AF_INET;      /* host byte order */
+        their_addr.sin_port = htons(PORT);    /* short, network byte order */
+        their_addr.sin_addr = *((struct in_addr *)he->h_addr);
+        bzero(&(their_addr.sin_zero), 8);     /* zero the rest of the struct */
+
+        if (connect(sockfd, (struct sockaddr *)&their_addr, \
+                                              sizeof(struct sockaddr)) == -1) {
+            perror("connect");
+            exit(1);
+        }
+	
+		if (send(sockfd, str, len, 0) == -1){
+                      perror("send");
+		      exit (1);
+		}
+		printf("After the send function \n");
+
+        	if ((numbytes=recv(sockfd, buf, MAXDATASIZE, 0)) == -1) {
+            		perror("recv");
+            		exit(1);
+		}	
+
+	        buf[numbytes] = '\0';
+
+        	printf("Received in pid=%d, text=: %s \n",getpid(), buf);
+	
+   close(sockfd);
+
+   return 0;
+   
+}
 
 // return false if error - true if pass
 bool UART_send_cmd(int *file)
@@ -185,7 +247,7 @@ float Get_Temperature()
   
    exit(1);
  }
- signal(SIGINT, signal_handler);
+ 
      if (read(fd,buf,2) != 2) {
       
        perror("Failed to read from the i2c bus.\n");
@@ -210,7 +272,7 @@ return f;
 
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	
 	int ARD_file, RASP_file, resp;
@@ -249,9 +311,14 @@ int main()
 		if(UART_receive_temp(&RASP_file, &RASP_temp) == false)	printf("UART for RASP failed to Read... Path: %s\n", RASP_UART_PATH);
 		
 		// *********** TEMPERATURE COMPARING HERE ***********
+
+		
 		// *********** SOCKET SENDING HERE ***********
 		printf("Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\n",ARD_temp,RASP_temp,LOCAL_temp);	// CHANGE TO SYSLOG
-		
+		char client_msg[200];
+		snprintf(&client_msg[0], 200, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\n",ARD_temp, RASP_temp, LOCAL_temp);
+		Client_Data(&client_msg[0], 200,argc,argv);
+
 		// Dynamic Time Buffer End....
 	}
 	

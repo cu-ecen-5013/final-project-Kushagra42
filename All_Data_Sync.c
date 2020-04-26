@@ -263,6 +263,7 @@ int main(int argc, char *argv[])
 	float LOCAL_temp, ARD_temp, RASP_temp;
 	struct timespec prev_t;
 	uint32_t sleep_time;
+	char client_msg[200];
 	
 	if(UART_periph_init(&ARD_file, ARD_UART_PATH) == false)		printf("UART for ARD failed to Initialize... Path: %s\n", ARD_UART_PATH);
 	
@@ -299,13 +300,15 @@ int main(int argc, char *argv[])
 		
 		// *********** SOCKET SENDING HERE ***********
 		printf("Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\n",ARD_temp,RASP_temp,LOCAL_temp);	// CHANGE TO SYSLOG
-		char client_msg[200];
 		snprintf(&client_msg[0], 200, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\n",ARD_temp, RASP_temp, LOCAL_temp);
 		Client_Data(&client_msg[0], 200);
 
 		// Dynamic Time Buffer End....
 	}
 	    	
+	snprintf(&client_msg[0], 200, "EXIT");
+	Client_Data(&client_msg[0], 200);
+
    	close(new_socket);
 
 	UART_periph_close(&ARD_file);

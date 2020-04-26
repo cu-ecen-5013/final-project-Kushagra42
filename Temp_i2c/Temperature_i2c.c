@@ -54,8 +54,6 @@ void uart_write( char tx_buffer)
   	options.c_iflag = IGNPAR | ICRNL;    //ignore partity errors, CR -> newline
    	tcflush(file, TCIFLUSH);             //discard file information not transmitted
    	tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
-	
-//	unsigned char transmit[] = "1";  //the string to send
 
    	if ((count = write(file, &tx_buffer,6)<0))
 	  {
@@ -64,8 +62,7 @@ void uart_write( char tx_buffer)
       		
    	}
 	printf("Write successful\n");
-   	
-//	usleep(1000000);    
+;    
 	close(file);
 
 }

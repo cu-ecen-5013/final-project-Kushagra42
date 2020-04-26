@@ -41,6 +41,7 @@
 #define SYNC_TIME_S		1
 #define ADDITIONAL_MS	100
 
+int fd;
 
 void signal_handler(int signum)
 {
@@ -170,8 +171,6 @@ bool SYNC_init(struct timespec *prev_t, uint32_t *sleep_time)
 
 float Get_Temperature()
 {
-
-int fd;
 
 
   char *bus = "/dev/i2c-1"; 

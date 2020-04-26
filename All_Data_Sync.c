@@ -94,7 +94,7 @@ bool UART_receive_temp(int *file, float *temp)
 		return false;
 	}
 	
-//	fcntl(*file, F_SETFL, 0);
+	fcntl(*file, F_SETFL, 0);
 	
 	count = read(*file, (void*)&receive[0], BUFFER_SIZE);	//receive the data
 	
@@ -166,6 +166,12 @@ float Get_Temperature()
 
 int fd;
 
+void signal_handler(int signum)
+{
+  assert(0 == close(fd));
+  exit(signum);
+}
+
   char *bus = "/dev/i2c-1"; 
   int addr = SLAVE_ADDR;    
   char buf[2] = {0};
@@ -185,7 +191,7 @@ int fd;
   
    exit(1);
  }
-
+ signal(SIGINT, signal_handler);
      if (read(fd,buf,2) != 2) {
       
        perror("Failed to read from the i2c bus.\n");

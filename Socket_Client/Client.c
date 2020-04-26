@@ -14,7 +14,7 @@
 
     int main(int argc, char *argv[])
     {
-        int sockfd, numbytes;  
+        int sockfd,numbytes;  
         char buf[MAXDATASIZE];
         struct hostent *he;
         struct sockaddr_in their_addr; /* connector's address information */
@@ -44,7 +44,7 @@
             perror("connect");
             exit(1);
         }
-	while (1) {
+	//while (1) {
 		if (send(sockfd, "Hello, world!\n", 14, 0) == -1){
                       perror("send");
 		      exit (1);
@@ -59,9 +59,9 @@
 	        buf[numbytes] = '\0';
 
         	printf("Received in pid=%d, text=: %s \n",getpid(), buf);
-		sleep(1);
+		//sleep(1);
 
-	}
+	//}
 
         close(sockfd);
 

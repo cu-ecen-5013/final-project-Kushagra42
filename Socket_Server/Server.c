@@ -305,7 +305,7 @@ int main(int argc, char *argv[])
 	accept_soc();
 
 	/***************** PRINT IP ADDRESS *************/
-	if(mode == 0) printf("IP addresses for %s:\n\n", Port);
+	/*if(mode == 0) printf("IP addresses for %s:\n\n", Port);
 
 	for(p = servinfo;p != NULL; p = p->ai_next)
 	{
@@ -322,7 +322,7 @@ int main(int argc, char *argv[])
 		// convert the IP to a string and print it:
 		inet_ntop(AF_INET, addr, ipstr, sizeof ipstr);
 		if(mode == 0) printf("  %s: %s\n", ipver, ipstr);
-	}
+	}*/
 
 	while(1)
 	{

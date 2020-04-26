@@ -184,6 +184,11 @@ int main()
        	 		}
 	
 		}
+		else
+		{
+			printf("Waiting for beaglebone to respond \n");
+		}
+
 	}
 return 0;
 

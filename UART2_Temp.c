@@ -3,6 +3,7 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<stdint.h>
 #include<unistd.h>
 #include<termios.h>   // using the termios.h library
 #include <errno.h>
@@ -137,8 +138,8 @@ void signal_handler(int signum)
   char *bus = "/dev/i2c-1"; 
   int addr = SLAVE_ADDR;    
   char buf[2] = {0};
-  int temp;
-  unsigned char MSB, LSB;
+  uint32_t temp;
+  uint32_t MSB, LSB, XLSB;
 
   float f,c;
 
@@ -164,10 +165,11 @@ void signal_handler(int signum)
 
    } else {
 
-       MSB = buf[0];
-       LSB = buf[1];
-
-       temp = ((MSB << 8) | LSB) >> 4;
+       MSB = (uint32_t)buf[3] << 12;
+       LSB = (uint32_t)buf[4] << 4;
+       XLSB = (uint32_t)buf[5] >> 4;
+       temp = MSB | LSB | XLSB;
+       printf("raw i2c daat is :%u",temp);
 
        c = temp*0.0625;
        f = (1.8 * c) + 32;

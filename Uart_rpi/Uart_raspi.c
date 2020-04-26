@@ -66,6 +66,10 @@ int main(){
 		{
 			printf("UART TX error\n");
 		}
+		else if (count==0)
+		{
+			printf("0 BYTES\n");
+		}
 	}
 	//----- CHECK FOR ANY RX BYTES -----
 	if (uart0_filestream != -1)

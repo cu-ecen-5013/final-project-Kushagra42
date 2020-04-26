@@ -17,7 +17,7 @@
 #include <fcntl.h>
 #include <assert.h>
 #define BUFFER_SIZE 100
-#define SLAVE_ADDR 0x40
+#define SLAVE_ADDR 0x76
 //Raspi UART Function
  float ARD_uart()
 {
@@ -120,7 +120,7 @@
 	Rasp_Temp = store_int/100.00;
 	printf("Temperature is:%.2f\n",Rasp_Temp);
    close(file);
-   return 0;
+   return Rasp_Temp;
 }
 
 float Get_Temperature()

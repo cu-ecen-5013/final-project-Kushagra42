@@ -140,7 +140,7 @@ bool UART_receive_temp(int *file, float *temp)
 		return false;
 	}
 	
-	fcntl(*file, F_SETFL, 0);
+	//fcntl(*file, F_SETFL, 0);
 	
 	count = read(*file, (void*)&receive[0], BUFFER_SIZE);	//receive the data
 	

@@ -29,7 +29,7 @@
 //Raspi UART Function
 
 #define START_CHAR		(char)'1'
-#define ARD_UART_PATH	"/dev/tty04"
+#define ARD_UART_PATH	"/dev/ttyO4"
 #define RASP_UART_PATH	"/dev/ttyO5"
 
 #define S_TO_NS			(uint32_t)1000000000

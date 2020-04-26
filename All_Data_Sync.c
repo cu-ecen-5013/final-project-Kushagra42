@@ -102,7 +102,7 @@ bool UART_send_cmd(int *file)
 	tout.tv_usec = 0;
 	
 	resp = select(*file + 1, NULL, &fds, NULL, &tout);
-	if(resp < 0)
+	if(resp <= 0)
 	{
 		perror("UART_send_cmd select() failed\n");
 		return false;
@@ -134,7 +134,7 @@ bool UART_receive_temp(int *file, float *temp)
 	tout.tv_usec = SELECT_R_WAIT_MS * MS_TO_US;
 	
 	resp = select(*file + 1, &fds, NULL, NULL, &tout);
-	if(resp < 0)
+	if(resp <= 0)
 	{
 		perror("UART_receive_temp select() failed\n");
 		return false;
@@ -151,11 +151,11 @@ bool UART_receive_temp(int *file, float *temp)
 		return false;
 	}
 	
-	if(count == 0) printf("UART ARD no data to read\n");
+	if(count == 0) printf("UART no data to read\n");
 	else 
 	{
 		temperature = atoi(receive);
-		printf("UART ARD got integer temp: %d\n",temperature);
+		printf("UART got integer temp: %d\n",temperature);
 		*temp = ((float)temperature)/100.00;
 	}
 	

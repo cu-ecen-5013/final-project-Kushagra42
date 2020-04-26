@@ -4,6 +4,8 @@
 #include <termios.h>		//Used for UART
 #include<stdlib.h>
 #include <string.h>
+
+
 int main(){
 //-------------------------
 	//----- SETUP USART 0 -----
@@ -62,7 +64,14 @@ int main(){
 	
 	if (uart0_filestream != -1)
 	{
-		int count = write(uart0_filestream, &tx_buffer, (8));		//Filestream, bytes to write, number of bytes to write
+		int count=0;
+		 for(int i = 0; i<8; i++)
+        	 {
+ //                	mySerial.write(conv[i]); 
+			count = write(uart0_filestream,& tx_buffer[i], (1));
+			count++;
+              	 }
+//		int count = write(uart0_filestream, &tx_buffer, (8));		//Filestream, bytes to write, number of bytes to write
 		if (count < 0)
 		{
 			printf("UART TX error\n");

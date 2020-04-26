@@ -172,8 +172,7 @@ int receive_soc(char *buf)
 	ret=recv(stoe_new_cos_fd, buf, PACKET_SIZE_MAX,0);
 	if(flag == 0)
 	{
-		if(mode == 0) printf("%s",buf);
-		if(strcmp(buf, "EXIT") == 0)	flag = 1;
+		if(mode == 0) printf("buffer:%s",buf);
 		if(ret<0)
 		{
 			if(mode == 0) printf("Error found is in receive:%s\n ",gai_strerror(ret));
@@ -183,6 +182,49 @@ int receive_soc(char *buf)
 	return ret;
 }
 
+void send_soc()
+{
+	char local_buf[FILE_SIZE_MAX], small_buf[PACKET_SIZE_MAX];
+	FILE *read_ref;
+	read_ref = fopen("/var/tmp/aesdsocketdata.txt", "r");
+	if(read_ref == 0)
+	{
+		if(mode == 0) printf("Error while opening file for sending\n");
+	}
+	else
+	{
+		uint32_t line_len = 0;
+		char *resp;
+		while(1)
+		{
+			resp = fgets(small_buf, PACKET_SIZE_MAX, read_ref);
+			if(resp == 0)
+			{
+				break;
+			}
+			else
+			{
+				memcpy(local_buf + (uint64_t)line_len, small_buf, strlen(small_buf));
+				line_len += strlen(small_buf);
+			}
+		}
+//		if(mode == 0) printf("sending:\n%s\n", local_buf);
+		size_t len, bytes_sent;
+
+//		fgets(local_buf, PACKET_SIZE_MAX, read_ref);
+		len = strlen(local_buf);
+		bytes_sent = send(stoe_new_cos_fd, local_buf, len, 0);
+
+		if(bytes_sent<0)
+		{
+			syslog(LOG_ERR,"Error found is in send:%s",gai_strerror(bytes_sent));
+			if(mode == 0) printf("Error found is in send:%s \n",gai_strerror(bytes_sent));
+		}
+
+		fclose(read_ref);
+	}
+
+}
 
 // sigterm handler
 void sig_exit(int value)
@@ -262,7 +304,25 @@ int main(int argc, char *argv[])
 	if(mode == 0) printf("accept_soc\n");
 	accept_soc();
 
-	
+	/***************** PRINT IP ADDRESS *************/
+	if(mode == 0) printf("IP addresses for %s:\n\n", Port);
+
+	for(p = servinfo;p != NULL; p = p->ai_next)
+	{
+		void *addr;
+		char *ipver;
+
+		if (p->ai_family == AF_INET)
+		{ 
+			struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
+			addr = &(ipv4->sin_addr);
+			ipver = "IPv4";
+		} 
+
+		// convert the IP to a string and print it:
+		inet_ntop(AF_INET, addr, ipstr, sizeof ipstr);
+		if(mode == 0) printf("  %s: %s\n", ipver, ipstr);
+	}
 
 	while(1)
 	{
@@ -285,17 +345,43 @@ int main(int argc, char *argv[])
 
 		else if(byte_cnt > 0)
 		{
+			ref = fopen("/var/tmp/aesdsocketdata.txt", "a+");
+
+			if(ref == 0)
+			{
+				if(mode == 0) printf("ERROR while opening file");
+				return -1;
+			}
+
+			uint32_t i;
+			char store_buf[PACKET_SIZE_MAX];
+			for(i = 0; *(my_buffer+i) != '\n'; i += 1);
+			strncpy(store_buf, my_buffer, i);
+
+			fprintf(ref, "%s", my_buffer);
+
+			fclose(ref);
+
 			if(mode == 0) printf("packet complete\n");
+			if(mode == 0) printf("sending entire file\n");
+			send_soc();
+	
+			
 		}
+		accept_soc();
 		if(flag == 1)
 		{
 			break;
 		}
 	}
 
+	remove("/var/tmp/aesdsocketdata.txt");
+
 	shutdown(store_fd, SHUT_RDWR);
 
 	closelog();
 	return 0;
 }
+
+
 

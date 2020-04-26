@@ -75,10 +75,12 @@ int main(){
 		int rx_length = read(uart0_filestream, (void*)rx_buffer, 255);		//Filestream, buffer to store in, number of bytes to read (max)
 		if (rx_length < 0)
 		{
+			printf("ERROR WHILE READING");
 			//An error occured (will occur if there are no bytes)
 		}
 		else if (rx_length == 0)
 		{
+			printf("NO data waiting");
 			//No data waiting
 		}
 		else
@@ -88,6 +90,7 @@ int main(){
 			printf("%i bytes read : %s\n", rx_length, rx_buffer);
 		}
 	}
+		printf("uart succesful");
 		//----- CLOSE THE UART -----
 	close(uart0_filestream);
 	return 0;

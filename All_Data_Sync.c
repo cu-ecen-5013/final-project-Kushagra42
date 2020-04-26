@@ -27,6 +27,7 @@
 #include <sys/types.h> 
 #include <netinet/in.h> 
 #include <sys/socket.h> 
+#include <arpa/inet.h>
 
 #define BUFFER_SIZE 100
 #define SLAVE_ADDR 0x76
@@ -49,58 +50,40 @@
 
 #define MAXDATASIZE 100 /* max number of bytes we can get at once */
 
-int Client_Data(char *str, uint32_t len,int argc,char* argv[])
+int new_socket;
+
+void Socket_Init()
+{
+	char target_ip[20] = "192.168.50.104";
+	uint32_t Port_Num = 9000;
+	struct sockaddr_in client;
+
+	
+	new_socket = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+	if(new_socket < 0)		printf("Socket Creation Failed\n");
+	
+	client.sin_family = AF_INET;
+	if(inet_pton(AF_INET, target_ip, &client.sin_addr) <= 0)	printf("Error in IP Address\n");
+	client.sin_port = htons(Port_Num);
+	
+	if(connect(new_socket, (struct sockaddr *)&client, sizeof(client)) == 0)	printf("Connect Succeeded\n");
+	else	printf("Connect Failed\n");
+	
+	//send data
+
+}
+int Client_Data(char *str, uint32_t len)
 {
 
-       int sockfd,numbytes;  
-        char buf[MAXDATASIZE];
-        struct hostent *he;
-        struct sockaddr_in their_addr; /* connector's address information */
+   
+    if (send(new_socket, str, len, 0) == -1)
+     {
+         perror("send");
+         exit (1);
+     }
+     printf("After the send function \n");
 
-        if (argc != 2) {
-            fprintf(stderr,"usage: client hostname\n");
-            exit(1);
-        }
-
-        if ((he=gethostbyname(argv[1])) == NULL) {  /* get the host info */
-            herror("gethostbyname");
-            exit(1);
-        }
-
-        if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-            perror("socket");
-            exit(1);
-        }
-
-        their_addr.sin_family = AF_INET;      /* host byte order */
-        their_addr.sin_port = htons(PORT);    /* short, network byte order */
-        their_addr.sin_addr = *((struct in_addr *)he->h_addr);
-        bzero(&(their_addr.sin_zero), 8);     /* zero the rest of the struct */
-
-        if (connect(sockfd, (struct sockaddr *)&their_addr, \
-                                              sizeof(struct sockaddr)) == -1) {
-            perror("connect");
-            exit(1);
-        }
-	
-		if (send(sockfd, str, len, 0) == -1){
-                      perror("send");
-		      exit (1);
-		}
-		printf("After the send function \n");
-
-        	if ((numbytes=recv(sockfd, buf, MAXDATASIZE, 0)) == -1) {
-            		perror("recv");
-            		exit(1);
-		}	
-
-	        buf[numbytes] = '\0';
-
-        	printf("Received in pid=%d, text=: %s \n",getpid(), buf);
-	
-   close(sockfd);
-
-   return 0;
+     return 0;
    
 }
 
@@ -286,7 +269,8 @@ int main(int argc, char *argv[])
 	if(UART_periph_init(&RASP_file, RASP_UART_PATH) == false)		printf("UART for RASP failed to Initialize... Path: %s\n", RASP_UART_PATH);
 	
 	if(SYNC_init(&prev_t, &sleep_time) == false)		printf("Getting time to initialize SYNC failed\n");
-	
+	Socket_Init();
+
 	for(i = 0; i < 10; i ++)
 	{
 		
@@ -317,11 +301,13 @@ int main(int argc, char *argv[])
 		printf("Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\n",ARD_temp,RASP_temp,LOCAL_temp);	// CHANGE TO SYSLOG
 		char client_msg[200];
 		snprintf(&client_msg[0], 200, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\n",ARD_temp, RASP_temp, LOCAL_temp);
-		Client_Data(&client_msg[0], 200,argc,argv);
+		Client_Data(&client_msg[0], 200);
 
 		// Dynamic Time Buffer End....
 	}
-	
+	    	
+   	close(new_socket);
+
 	UART_periph_close(&ARD_file);
 	UART_periph_close(&RASP_file);
 	

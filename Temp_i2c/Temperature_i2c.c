@@ -28,7 +28,7 @@
 
 
 #define Si7021_address 0x40
-int beaglebone=1;
+
 float cTemp;
 
 char conv[20]= {0};

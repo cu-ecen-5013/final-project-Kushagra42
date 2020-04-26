@@ -70,7 +70,7 @@ int main(){
 	//----- CHECK FOR ANY RX BYTES -----
 	if (uart0_filestream != -1)
 	{
-		 fcntl(file, F_SETFL, 0);
+		 fcntl(uart0_filestream, F_SETFL, 0);
 		// Read up to 255 characters from the port if they are there
 		unsigned char rx_buffer[256];
 		int rx_length = read(uart0_filestream, (void*)rx_buffer, 255);		//Filestream, buffer to store in, number of bytes to read (max)

@@ -41,13 +41,6 @@
 #define SYNC_TIME_S		1
 #define ADDITIONAL_MS	100
 
-int fd;
-
-void signal_handler(int signum)
-{
-  assert(0 == close(fd));
-  exit(signum);
-}
 
 // return false if error - true if pass
 bool UART_send_cmd(int *file)
@@ -172,7 +165,7 @@ bool SYNC_init(struct timespec *prev_t, uint32_t *sleep_time)
 float Get_Temperature()
 {
 
-
+  int fd;
   char *bus = "/dev/i2c-1"; 
   int addr = SLAVE_ADDR;    
   char buf[2] = {0};

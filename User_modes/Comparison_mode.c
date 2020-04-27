@@ -1,15 +1,52 @@
 #include"stdio.h"
 
 //REFERENCE_MODE
-
+//COMPARISON_MODE
 //STATICTIC_MODE
 
 #define REFERENCE_MODE
 //#define STATISTIC_MODE
-
+//#define COMPARISON_MODE
 
 char *msg;
-	
+#ifdef COMPARISON_MODE
+int Data_Analysis(int sensor1,int sensor2,int sensor3)
+{
+char *msg;
+
+if ((sensor1 == sensor2 && sensor1 == sensor3)||(sensor1 == sensor2 && sensor2 == sensor3))
+	{
+		printf("All sensor data are same %d", sensor1);
+		msg = "All sensor data are same";
+		return sensor1;
+	}
+else if (sensor1 == sensor2 && sensor1 != sensor3)
+	{
+		printf("sensor1 and sensor2 data are same %d", sensor1);
+		msg = "sensor1 and sensor2 data are same";
+		return sensor1;
+	}
+else if (sensor1 != sensor2 && sensor2 == sensor3)
+	{
+		printf("sensor2 and sensor3 data are same %d", sensor2);
+		msg = "sensor2 and sensor3 data are same";
+		return sensor2;
+	}
+else if (sensor1 != sensor2 && sensor1 == sensor3)
+	{
+		printf("sensor1 and sensor3 data are same %d", sensor3);
+		msg = "sensor1 and sensor3 data are same";
+		return sensor3;
+	}
+else 
+	{
+		printf("All are Faulty Values");
+		msg = "All are Faulty Values";
+		return 0;
+	}
+}
+#endif
+
 #ifdef REFERENCE_MODE
 int Data_Analysis(int sensor1,int sensor2,int sensor3)
 {

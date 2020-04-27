@@ -1,6 +1,12 @@
 #include <SoftwareSerial.h>
 #include <stdlib.h>
 
+#define LOAD_MINIMUM_TIME_MS      10
+#define LOAD_MAXIMUM_TIME_MS      250
+#define SYNC_TIME_MS              100
+
+#define DUMMY_MS()                       random(LOAD_MINIMUM_TIME_MS, LOAD_MAXIMUM_TIME_MS)
+
 SoftwareSerial mySerial(2, 3); // RX, TX
 char inChar;
 const int temperaturePin = 0;
@@ -12,17 +18,9 @@ char conv[20]= {0};
 
 void setup()
 {
- 
   Serial.begin(9600);
-  // Open serial communications and wait for port to open:
- while (!Serial) {
-    ; // wait for serial port to connect. Needed for Native USB only
-  }
-  //Serial.println("Awaiting command from BBB...");
-  // set the data rate for the SoftwareSerial port
+  while(!Serial); 
   mySerial.begin(115200);
-  pinMode(13, OUTPUT);
-  
 }
 
 float temp_read()
@@ -31,51 +29,37 @@ float temp_read()
   voltage = getVoltage(temperaturePin);
   degreesC = (voltage - 0.5) * 100.0;  
   degreesF = degreesC * (9.0/5.0) + 32.0;
-  Serial.print("voltage: ");
-  Serial.print(voltage);
-  Serial.print("  deg C: ");
-  Serial.print(degreesC);
-  Serial.print("  deg F: ");
-  Serial.println(degreesF);
   return  degreesF;
-  }
+}
 
 float getVoltage(int pin)
 {
-    return (analogRead(pin) * 0.004882814);
+  return (analogRead(pin) * 0.004882814);
+}
+
+void sendTempSerially(float f_temp)
+{
+  send_temp = (f_temp * 100);
+  itoa(send_temp,conv,10);
+  for(int i = 0; i<4; i++)  mySerial.write(conv[i]); 
 }
 
 void loop() // run over and over
 {
   //Serial.print(temp_read());
   if (mySerial.available())
+  {
+    // Serial.write(mySerial.read());
+    inChar = mySerial.read();
+    
+    if(inChar== '1')
     {
-       // Serial.write(mySerial.read());
-       delay(10);
-       inChar = mySerial.read();
-  
-      if(inChar== '1')
-        {
-             Serial.print("Received read and transmit instructions from BBB ");
-             digitalWrite(13, HIGH);
-
-             float f_temp = temp_read();
-             send_temp = (f_temp * 100);
-             itoa(send_temp,conv,10);
-
-             for(int i = 0; i<3; i++)
-              {
-                 mySerial.write(conv[i]); 
-              }
-      
-              Serial.print(send_temp);
-      
-              delay(20);
-        }
-      else if(value == '0')
-        {
-             Serial.print("Awaitng read and transmit instruction from BBB");    
-              digitalWrite(13, LOW);   
-        }
+      //delay(DUMMY_MS());
+      float f_temp = temp_read();
+      delay(SYNC_TIME_MS);
+      //sendTempSerially(70.59);
+      sendTempSerially(f_temp);
     }
+    //else if(inChar == '0')  Serial.print("Awaitng read and transmit instruction from BBB");  
+  }
 }

@@ -8,7 +8,7 @@ ifeq ($(CFLAGS),)
 endif
 
 #Recipe to compile
-all: Server_OP Temperature_i2c_OP Uart_raspi_OP All_Task_OP All_Data_Sync_OP User_modes_OP bme280_OP HRT_System_OP
+all: Server_OP Temperature_i2c_OP Uart_raspi_OP All_Task_OP All_Data_Sync_OP User_modes_OP bme280_OP HRT_System_OP Client_OP
 
 Temperature_i2c_OP:./Temp_i2c/Temperature_i2c
 	$(CC) $(CFLAGS) -o Temperature_i2c ./Temp_i2c/Temperature_i2c.c
@@ -18,6 +18,9 @@ Uart_raspi_OP:./Uart_rpi/Uart_raspi
 
 Server_OP:./Socket_Server/Server
 	$(CC) $(CFLAGS) -o Server ./Socket_Server/Server.c $(INCLUDES)
+
+Client_OP:./Socket_Client/Client
+	$(CC) $(CFLAGS) -o Client ./Socket_Client/Client.c $(INCLUDES)
 
 Temp_Test_OP:./I2C_TEMP_BB/Temp_Test
 	$(CC) $(CFLAGS) -o Temp_Test ./I2C_TEMP_BB/Temp_Test.c

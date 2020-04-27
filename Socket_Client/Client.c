@@ -8,20 +8,25 @@
     #include <sys/socket.h> 
     #include <unistd.h>
     #include <arpa/inet.h>
+    #include <time.h>
+    #include <signal.h>
     #define PORT 9000    /* the port client will be connecting to */
 
     #define MAXDATASIZE 100 /* max number of bytes we can get at once */
     
 
 
-    int new_socket;
+int new_socket;
+time_t ltime;
+struct tm * timeinfo;
+
 
 void Socket_Init()
 {
-	char target_ip[20] = "192.168.50.104";
+	char target_ip[20] = "127.0.0.1";
 	uint32_t Port_Num = 9000;
 	struct sockaddr_in client;
-
+	timeinfo = localtime (&ltime);
 	
 	new_socket = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	if(new_socket < 0)		printf("Socket Creation Failed\n");
@@ -46,7 +51,9 @@ int Client_Data(char *str, uint32_t len)
          exit (1);
      }
      printf("After the send function \n");
-
+     printf("Time:  %s \n Data :",asctime( localtime(&ltime) ) );
+     printf("\n %s \n Data :",asctime (timeinfo));
+     
      return 0;
    
 }

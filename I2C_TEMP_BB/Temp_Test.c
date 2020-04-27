@@ -80,7 +80,7 @@ int main()
 	printf("TEmperature value is:%f",temperature);
         sleep(1);
   
-
+return 0;
 
 
 }

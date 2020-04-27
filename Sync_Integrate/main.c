@@ -29,11 +29,13 @@
 #include <sys/socket.h> 
 #include <arpa/inet.h>
 
+#include "hard_realtime.h"
+
 #define BUFFER_SIZE 100
 #define SLAVE_ADDR 0x76
 //Raspi UART Function
 
-#define START_CHAR		(char)'1'
+#define START_CHAR	(char)'1'
 #define ARD_UART_PATH	"/dev/ttyO4"
 #define RASP_UART_PATH	"/dev/ttyO5"
 
@@ -59,6 +61,7 @@
 
 
 char *msg;
+
 int User_Modes(int sensor1,int sensor2,int sensor3)
 {
 
@@ -221,22 +224,9 @@ int Client_Data(char *str, uint32_t len)
 bool UART_send_cmd(int *file)//o
 {
 	char cmd = START_CHAR;//
-	fd_set fds;
-	struct timeval tout;
-	int resp;
+
+	hr_monitor_fd(file, 0, HR_WATCH_FOR_WRITE_MASK);
 	
-	FD_ZERO(&fds);
-	FD_SET(*file, &fds);
-	
-	tout.tv_sec = 0;
-	tout.tv_usec = 0;
-	
-	resp = select(*file + 1, NULL, &fds, NULL, &tout);
-	if(resp <= 0)
-	{
-		perror("UART_send_cmd select() failed\n");
-		return false;
-	}
 	
 	if(write(*file, &cmd, sizeof(cmd)) != sizeof(cmd))
 	{
@@ -253,24 +243,7 @@ bool UART_receive_temp(int *file, float *temp)
 	uint8_t	count;	
 	int	temperature;
 
-	fd_set fds;
-	struct timeval tout;
-	int resp;
-	
-	FD_ZERO(&fds);
-	FD_SET(*file, &fds);
-	
-	tout.tv_sec = 0;
-	tout.tv_usec = SELECT_R_WAIT_MS * MS_TO_US;
-	
-	resp = select(*file + 1, &fds, NULL, NULL, &tout);
-	if(resp <= 0)
-	{
-		perror("UART_receive_temp select() failed\n");
-		return false;
-	}
-	
-	//fcntl(*file, F_SETFL, 0);
+	hr_monitor_fd(file, SELECT_R_WAIT_MS, HR_WATCH_FOR_READ_MASK);
 	
 	count = read(*file, (void*)&receive[0], BUFFER_SIZE);	//receive the data
 	
@@ -303,7 +276,7 @@ bool UART_periph_init(int *file, char *path)
 	}
 	
 	struct termios options;               //The termios structure is vital
-    tcgetattr(*file, &options);            //Sets the parameters associated with file
+        tcgetattr(*file, &options);            //Sets the parameters associated with file
 
 	// Set up the communications options:
 	//   9600 baud, 8-bit, enable receiver, no modem control lines
@@ -322,19 +295,6 @@ bool UART_periph_init(int *file, char *path)
 void UART_periph_close(int *file)
 {
 	close(*file);
-}
-
-bool SYNC_init(struct timespec *prev_t, uint32_t *sleep_time)
-{
-	*sleep_time = SYNC_TIME_S * S_TO_NS;
-	
-	if(clock_gettime(CLOCK_REALTIME, prev_t) != 0)
-	{
-		perror("SYNC_init failed\n");
-		return false;
-	}
-	
-	return true; 
 }
 
 float Get_Temperature()
@@ -388,12 +348,12 @@ return f;
 int main(int argc, char *argv[])
 {
 	
-	int ARD_file, RASP_file, resp;
+	int ARD_file, RASP_file;// resp;
 	uint8_t i;
 	float LOCAL_temp, ARD_temp, RASP_temp;
 	int I2C_Sensor, ARD_Sensor, Raspi_Sensor;
 	struct timespec prev_t;
-	uint32_t sleep_time;
+	//uint32_t sleep_time;
 	char client_msg[200];
 	
 	
@@ -402,8 +362,7 @@ int main(int argc, char *argv[])
 	
 	if(UART_periph_init(&RASP_file, RASP_UART_PATH) == false)		printf("UART for RASP failed to Initialize... Path: %s\n", RASP_UART_PATH);
 	
-	if(SYNC_init(&prev_t, &sleep_time) == false)		printf("Getting time to initialize SYNC failed\n");
-	Socket_Init();
+        Socket_Init();
 
 	for(i = 0; i < 10; i ++)
 	{
@@ -411,13 +370,9 @@ int main(int argc, char *argv[])
 		// Add a fix offset to previous absoulte time
 		prev_t.tv_sec = prev_t.tv_sec + SYNC_TIME_S;
 
-		// Sleep till the absolute time supplied by prev_t
-		do//
-		{
-			resp = clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &prev_t, NULL);
-		}while(resp != 0);//
-		
+		hr_dynamic_time_buffer_wait(SYNC_TIME_S*100);
 		// Dynamic Time Buffer Start....
+		
 		
 		if(UART_send_cmd(&ARD_file) == false)	printf("UART for ARD failed to Send... Path: %s\n", ARD_UART_PATH);
 		if(UART_send_cmd(&RASP_file) == false)	printf("UART for RASP failed to Send... Path: %s\n", RASP_UART_PATH);
@@ -463,7 +418,5 @@ int main(int argc, char *argv[])
 	printf("Exiting...");
 	exit(0);
 return 0;
-
-
 }
 

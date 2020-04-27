@@ -7,13 +7,8 @@ ifeq ($(CFLAGS),)
 	CFLAGS= -g -Wall -Werror
 endif
 
-ifeq ($(LDFLAGS),)
-	LDFLAGS= -pthread -lrt
-endif
-
 #Recipe to compile
-all:Client_OP Server_OP Hello_OP Uart_write_OP Uart_read_OP Temperature_i2c_OP Uart_raspi_OP Uart_readwrite_OP Uart_Rasp_ARD_WR_OP All_Task_OP All_Data_Sync_OP User_modes_OP main_OP
-
+all: Server_OP Temperature_i2c_OP Uart_raspi_OP All_Task_OP All_Data_Sync_OP User_modes_OP bme280_OP 
 
 Temperature_i2c_OP:./Temp_i2c/Temperature_i2c
 	$(CC) $(CFLAGS) -o Temperature_i2c ./Temp_i2c/Temperature_i2c.c
@@ -21,29 +16,11 @@ Temperature_i2c_OP:./Temp_i2c/Temperature_i2c
 Uart_raspi_OP:./Uart_rpi/Uart_raspi
 	$(CC) $(CFLAGS) -o Uart_raspi ./Uart_rpi/Uart_raspi.c
 
-Client_OP:./Socket_Client/Client
-	$(CC) $(CFLAGS) -o Client ./Socket_Client/Client.c $(LDFLAGS) $(INCLUDES)
-	
 Server_OP:./Socket_Server/Server
-	$(CC) $(CFLAGS) -o Server ./Socket_Server/Server.c $(LDFLAGS) $(INCLUDES)
-
-Hello_OP: Hello
-	$(CC) $(CFLAGS) -o Hello Hello.c
-
-Uart_write_OP:./UART_Communication/uart_write
-	$(CC) $(CFLAGS) -o uart_write ./UART_Communication/uart_write.c
-
-Uart_read_OP:./UART_Communication/uart_read
-	$(CC) $(CFLAGS) -o uart_read ./UART_Communication/uart_read.c
-
-Uart_readwrite_OP:./UART_Communication/uart_ReadWrite
-	$(CC) $(CFLAGS) -o uart_ReadWrite ./UART_Communication/uart_ReadWrite.c
+	$(CC) $(CFLAGS) -o Server ./Socket_Server/Server.c $(INCLUDES)
 
 Temp_Test_OP:./I2C_TEMP_BB/Temp_Test
 	$(CC) $(CFLAGS) -o Temp_Test ./I2C_TEMP_BB/Temp_Test.c
-
-Uart_Rasp_ARD_WR_OP:./UART_Communication/uart_Rasp_ARD_WR
-	$(CC) $(CFLAGS) -o uart_Rasp_ARD_WR ./UART_Communication/uart_Rasp_ARD_WR.c
 
 All_Task_OP:UART2_Temp
 	$(CC) $(CFLAGS) -o UART2_Temp UART2_Temp.c
@@ -54,14 +31,18 @@ All_Data_Sync_OP:All_Data_Sync
 User_modes_OP:./User_modes/Comparison_mode
 	$(CC) $(CFLAGS) -o Comparison_mode ./User_modes/Comparison_mode.c
 
-main_OP:./I2C_Data_BB/main
-	$(CC) $(CFLAGS) -o main ./I2C_Data_BB/main.c
+bme280_OP:./I2C_Data_BB/bme280
+	$(CC) $(CFLAGS) -o bme280 ./I2C_Data_BB/bme280.c
 
+hard_realtime_OP:
+	$(CC) -c ./Sync_Integrate/hard_realtime.c -o hard_realtime $(INCLUDES) 	
 
+HRT_System_OP:./Sync_Integrate/main.c
+	$(CC) $(CFLAGS) -o main ./Sync_Integrate/main.c $(INCLUDES) 
 
 #cleaning all the executable files
 clean:
-	rm -f *.o Client Server Hello uart_write uart_read Temperature_i2c Si7021 uart_Rasp_ARD_WR ./UART_Communication/uart_Rasp_ARD_WR ./UART_Communication/uart_ReadWrite ./UART_Communication/uart_write ./UART_Communication/uart_read ./Socket_Server/Server ./Socket_Client/Client UART2_Temp All_Data_Sync Comparison_mode /User_modes/Comparison_mode main ./I2C_Data_BB/main
+	rm -f *.o Server  Temperature_i2c ./Socket_Server/Server ./Socket_Client/Client UART2_Temp All_Data_Sync Comparison_mode /User_modes/Comparison_mode bme280 ./I2C_Data_BB/bme280 main hard_realtime
 
 
 

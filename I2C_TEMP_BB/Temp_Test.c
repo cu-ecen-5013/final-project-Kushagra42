@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
@@ -22,15 +23,14 @@ void signal_handler(int signum)
   assert(0 == close(fd));
   exit(signum);
 }
-
-int main(){
-
+float Get_Temperature()
+{
 
   char *bus = "/dev/i2c-1"; 
   int addr = SLAVE_ADDR;    
   char buf[2] = {0};
-  int temp;
-  unsigned char MSB, LSB;
+  uint32_t temp;
+  uint32_t MSB, LSB, XLSB;
 
   float f,c;
 
@@ -48,8 +48,7 @@ int main(){
 
  signal(SIGINT, signal_handler);
 
- while(1)
-   {
+
      
      if (read(fd,buf,2) != 2) {
       
@@ -57,10 +56,11 @@ int main(){
 
    } else {
 
-       MSB = buf[0];
-       LSB = buf[1];
-
-       temp = ((MSB << 8) | LSB) >> 4;
+       MSB = (uint32_t)buf[3] << 12;
+       LSB = (uint32_t)buf[4] << 4;
+       XLSB = (uint32_t)buf[5] >> 4;
+       temp = MSB | LSB | XLSB;
+       printf("raw i2c daat is :%u",temp);
 
        c = temp*0.0625;
        f = (1.8 * c) + 32;
@@ -68,7 +68,18 @@ int main(){
        printf("Temp Fahrenheit: %f Celsius: %f\n", f, c);
      }
      sleep(1);
-   }
+
+return f;
+
+}
+
+int main()
+{
+
+	float temperature=Get_Temperature();
+	printf("TEmperature value is:%f",temperature);
+        sleep(1);
+  
 
 
 

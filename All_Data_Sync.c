@@ -194,11 +194,8 @@ int64_t var1_64, var2_64;
 	var2 = (((((t >> 4) - (calT1)) * ((t>>4) - (calT1))) >> 12) * (calT3)) >> 14;
 	t_fine = var1 + var2;
 	*T = (t_fine * 5 + 128) >> 8;
-	*T /= 100;
-   	*T *= 1.8;
-    	*T += 32;
-     	
-
+	*T = *T * (9/5) + 32;
+   	
 
 	// Calculate calibrated pressure value
 	var1_64 = t_fine - 128000;
@@ -535,9 +532,7 @@ int main(int argc, char *argv[])
 	}
 	printf("BME280 device successfully opened.\n");
 	usleep(1000000); // wait for data to settle for first read
-	LOCAL_temp = bme280ReadValues(&T, &P, &H);
-	printf("Calibrated temp. = %3.2f C, pres. = %6.2f Pa, hum. = %2.2f%%\n", (float)T/100.0, (float)P/256.0, (float)H/1024.0);
-	usleep(DELAY);
+	
 /*********************BME280***********************/
 	
 	if(UART_periph_init(&ARD_file, ARD_UART_PATH) == false)		printf("UART for ARD failed to Initialize... Path: %s\n", ARD_UART_PATH);
@@ -555,16 +550,17 @@ int main(int argc, char *argv[])
 		prev_t.tv_sec = prev_t.tv_sec + SYNC_TIME_S;
 
 		// Sleep till the absolute time supplied by prev_t
-		do//
+		do
 		{
 			resp = clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &prev_t, NULL);
-		}while(resp != 0);//
+		}while(resp != 0);
 		
 		// Dynamic Time Buffer Start....
 		
 		if(UART_send_cmd(&ARD_file) == false)	printf("UART for ARD failed to Send... Path: %s\n", ARD_UART_PATH);
 		if(UART_send_cmd(&RASP_file) == false)	printf("UART for RASP failed to Send... Path: %s\n", RASP_UART_PATH);
-		
+		LOCAL_temp = bme280ReadValues(&T, &P, &H);
+	        
 				
 		if(UART_receive_temp(&ARD_file, &ARD_temp) == false)	printf("UART for ARD failed to Read... Path: %s\n", ARD_UART_PATH);
 
@@ -575,7 +571,9 @@ int main(int argc, char *argv[])
 		
 		// *********** SOCKET SENDING HERE ***********
 		printf("Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\n",ARD_temp,RASP_temp,LOCAL_temp);	// CHANGE TO SYSLOG
+		
 		snprintf(&client_msg[0], 200, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\n",ARD_temp, RASP_temp, LOCAL_temp);
+		
 		Client_Data(&client_msg[0], 200);
 	
 		I2C_Sensor = LOCAL_temp;

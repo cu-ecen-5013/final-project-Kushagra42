@@ -12,7 +12,7 @@ ifeq ($(LDFLAGS),)
 endif
 
 #Recipe to compile writer.c
-all:Client_OP Server_OP Hello_OP Uart_write_OP Uart_read_OP Temperature_i2c_OP Uart_raspi_OP Uart_readwrite_OP Si7021_OP Uart_Rasp_ARD_WR_OP All_Task_OP All_Data_Sync_OP User_modes_OP
+all:Client_OP Server_OP Hello_OP Uart_write_OP Uart_read_OP Temperature_i2c_OP Uart_raspi_OP Uart_readwrite_OP Uart_Rasp_ARD_WR_OP All_Task_OP All_Data_Sync_OP User_modes_OP
 
 
 Temperature_i2c_OP:./Temp_i2c/Temperature_i2c
@@ -54,8 +54,14 @@ All_Data_Sync_OP:All_Data_Sync
 User_modes_OP:./User_modes/Comparison_mode
 	$(CC) $(CFLAGS) -o Comparison_mode ./User_modes/Comparison_mode.c
 
+main_OP:./I2C_Data_BB/main
+	$(CC) $(CFLAGS) -o main ./I2C_Data_BB/main.c $(INCLUDES)
+
+
+
 #cleaning all the executable files
 clean:
-	rm -f *.o Client Server Hello uart_write uart_read Temperature_i2c Si7021 uart_Rasp_ARD_WR ./UART_Communication/uart_Rasp_ARD_WR ./UART_Communication/uart_ReadWrite ./UART_Communication/uart_write ./UART_Communication/uart_read ./Socket_Server/Server ./Socket_Client/Client UART2_Temp All_Data_Sync Comparison_mode /User_modes/Comparison_mode
+	rm -f *.o Client Server Hello uart_write uart_read Temperature_i2c Si7021 uart_Rasp_ARD_WR ./UART_Communication/uart_Rasp_ARD_WR ./UART_Communication/uart_ReadWrite ./UART_Communication/uart_write ./UART_Communication/uart_read ./Socket_Server/Server ./Socket_Client/Client UART2_Temp All_Data_Sync Comparison_mode /User_modes/Comparison_mode main ./I2C_Data_BB/main
+
 
 

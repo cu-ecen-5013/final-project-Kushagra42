@@ -50,6 +50,136 @@
 
 #define MAXDATASIZE 100 /* max number of bytes we can get at once */
 
+
+/************************USER MODES********************************/
+#define REFERENCE_MODE
+//#define STATISTIC_MODE
+//#define COMPARISON_MODE
+/************************USER MODES********************************/
+
+
+char *msg;
+int User_Modes(int sensor1,int sensor2,int sensor3)
+{
+
+#ifdef COMAPRISON_MODE
+
+	if ((sensor1 == sensor2 && sensor1 == sensor3)||(sensor1 == sensor2 && sensor2 == sensor3))
+	{
+		printf("All sensor data are same %d", sensor1);
+		msg = "All sensor data are same";
+		return sensor1;
+	}
+	else if (sensor1 == sensor2 && sensor1 != sensor3)
+	{
+		printf("sensor1 and sensor2 data are same %d", sensor1);
+		msg = "sensor1 and sensor2 data are same";
+		return sensor1;
+	}
+	else if (sensor1 != sensor2 && sensor2 == sensor3)
+	{
+		printf("sensor2 and sensor3 data are same %d", sensor2);
+		msg = "sensor2 and sensor3 data are same";
+		return sensor2;
+	}
+	else if (sensor1 != sensor2 && sensor1 == sensor3)
+	{
+		printf("sensor1 and sensor3 data are same %d", sensor3);
+		msg = "sensor1 and sensor3 data are same";
+		return sensor3;
+	}
+	else 
+	{
+		printf("All are Faulty Values");
+		msg = "All are Faulty Values";
+		return 0;
+	}
+#endif
+
+#ifdef REFERENCE_MODE
+	if((sensor1 == sensor3) && (sensor2==sensor3))
+	{
+		printf("All sensor data is correct\n");
+		msg = "All sensor data is correct";
+		return sensor3;
+	}
+	else if((sensor1 != sensor3) && (sensor2 == sensor3))
+	{
+		printf("Sensor 1 data is wrong\n");
+		msg = "Sensor 1 data is wrong";
+		return sensor3;
+	}
+	else if((sensor1 == sensor3) && (sensor2 != sensor3))
+	{
+		printf("Sensor 2 data is wrong\n");
+		msg = "Sensor 2 data is wrong";
+		return sensor3;
+	}
+  	else if((sensor1 == sensor2) && (sensor1 != sensor3))
+	{
+		printf("Sensor 3 data is wrong\n");
+		msg = "Sensor 3 data is wrong";
+		return sensor3;
+	}
+	else
+	{
+		printf("All 3 sensors have different values\n");
+		msg = "All 3 sensors have different values, Considering reference sensor";
+		return sensor3;
+	}
+
+
+
+#endif
+
+#ifdef STATISTIC_MODE
+
+	if(((sensor1 == sensor2) && (sensor1 == sensor3))||((sensor1 == sensor2) && (sensor2 == sensor3)))
+	{
+		printf("Final value will be average of all 3 sensors\n");
+		msg = "Final value will be average of all 3 sensors";
+		int avg_temp = (sensor1 + sensor2 + sensor3)/3;
+		return avg_temp;
+	}
+	else if((sensor1 == sensor2+1 || sensor1 == sensor2-1) && (sensor1 == sensor3+2 || sensor1 == sensor3-2) && (sensor2 == sensor3+1 || sensor3 == sensor3-1))
+	{
+		printf("All sensor values are in range\n");
+		msg = "All sensor values are in range";
+		int avg_temp = (sensor1 + sensor2 + sensor3)/3;
+		return avg_temp;
+	}
+	else if((sensor1 == sensor2+1 || sensor1 ==  sensor2-1) && (sensor1 != sensor3+2 || sensor1 != sensor3-2) && (sensor2 != sensor3+1 || sensor3 != sensor3-1))
+	{
+		printf("Sensor 3 is not in range\n");
+		msg = "Sensor 3 is not in range";
+		int avg_temp = (sensor1 + sensor2)/2;
+		return avg_temp;
+	}
+	else if((sensor1 != sensor2+1 || sensor1 != sensor2-1) && (sensor1 == sensor3+1 || sensor1 == sensor3-1) && (sensor2 != sensor3+1 || sensor3 != sensor3-1))
+	{
+		printf("Sensor 2 is not in range\n");
+		msg = "Sensor 2 is not in range";
+		int avg_temp = (sensor1 + sensor3)/2;
+		return avg_temp;
+	}
+	else if((sensor1 != sensor2+1 || sensor1 != sensor2-1) && (sensor1 != sensor3+1 || sensor1 != sensor3-1) && (sensor2 == sensor3+1 || sensor3 == sensor3-1))
+	{
+		printf("Sensor 1 is not in range\n");
+		msg = "Sensor 1 is not in range";
+		int avg_temp = (sensor3 + sensor2)/2;
+		return avg_temp;
+	}
+	else
+	{
+		printf("All are Faulty Values");
+		msg = "All are Faulty Values";
+		return 0;
+	}
+
+#endif
+}
+
+
 int new_socket;
 
 void Socket_Init()
@@ -261,9 +391,12 @@ int main(int argc, char *argv[])
 	int ARD_file, RASP_file, resp;
 	uint8_t i;
 	float LOCAL_temp, ARD_temp, RASP_temp;
+	int I2C_Sensor, ARD_Sensor, Raspi_Sensor;
 	struct timespec prev_t;
 	uint32_t sleep_time;
 	char client_msg[200];
+	
+	
 	
 	if(UART_periph_init(&ARD_file, ARD_UART_PATH) == false)		printf("UART for ARD failed to Initialize... Path: %s\n", ARD_UART_PATH);
 	
@@ -290,19 +423,31 @@ int main(int argc, char *argv[])
 		if(UART_send_cmd(&RASP_file) == false)	printf("UART for RASP failed to Send... Path: %s\n", RASP_UART_PATH);
 		
 		LOCAL_temp = Get_Temperature();
-
+		
 		if(UART_receive_temp(&ARD_file, &ARD_temp) == false)	printf("UART for ARD failed to Read... Path: %s\n", ARD_UART_PATH);
 
 		if(UART_receive_temp(&RASP_file, &RASP_temp) == false)	printf("UART for RASP failed to Read... Path: %s\n", RASP_UART_PATH);
 		
-		// *********** TEMPERATURE COMPARING HERE ***********
-
+		// *********** TEMPERATURE COMPARING ***********
+		I2C_Sensor = LOCAL_temp;
+		ARD_Sensor = ARD_temp;
+		Raspi_Sensor = RASP_temp;
+		
+		int Sensor_Selected_Value = User_Modes(I2C_Sensor,ARD_Sensor,Raspi_Sensor);
+		
 		
 		// *********** SOCKET SENDING HERE ***********
 		printf("Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\n",ARD_temp,RASP_temp,LOCAL_temp);	// CHANGE TO SYSLOG
 		snprintf(&client_msg[0], 200, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\n",ARD_temp, RASP_temp, LOCAL_temp);
 		Client_Data(&client_msg[0], 200);
 
+		//***********Sending Comparison Analysis data ove socket******
+		printf("I2C_Sensor: %.2d\nARD_Sensor: %.2d\nRaspi_Sensor: %.2d\n",I2C_Sensor,ARD_Sensor,Raspi_Sensor);	// CHANGE TO SYSLOG
+		snprintf(&client_msg[0], 200, "Sensor_Selected_Value: %.2d\n",Sensor_Selected_Value);
+		Client_Data(&client_msg[0], 200);
+
+		snprintf(&client_msg[0], 200, "Sensor Fault detection message: %.2s\n",msg);
+		Client_Data(&client_msg[0], 200);
 		// Dynamic Time Buffer End....
 	}
 	    	

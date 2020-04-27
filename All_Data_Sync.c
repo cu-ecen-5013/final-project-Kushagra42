@@ -41,9 +41,9 @@
 #define MS_TO_NS		(uint32_t)1000000
 #define MS_TO_US		(uint32_t)1000
 
-#define SELECT_R_WAIT_MS	500
+#define SELECT_R_WAIT_MS	500//
 
-#define SYNC_TIME_S		1
+#define SYNC_TIME_S		1//m*100
 #define ADDITIONAL_MS	100
 
 #define PORT 9000    /* the port client will be connecting to */
@@ -88,9 +88,9 @@ int Client_Data(char *str, uint32_t len)
 }
 
 // return false if error - true if pass
-bool UART_send_cmd(int *file)
+bool UART_send_cmd(int *file)//o
 {
-	char cmd = START_CHAR;
+	char cmd = START_CHAR;//
 	fd_set fds;
 	struct timeval tout;
 	int resp;
@@ -279,10 +279,10 @@ int main(int argc, char *argv[])
 		prev_t.tv_sec = prev_t.tv_sec + SYNC_TIME_S;
 
 		// Sleep till the absolute time supplied by prev_t
-		do
+		do//
 		{
 			resp = clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &prev_t, NULL);
-		}while(resp != 0);
+		}while(resp != 0);//
 		
 		// Dynamic Time Buffer Start....
 		

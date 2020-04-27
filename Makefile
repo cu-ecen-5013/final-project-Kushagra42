@@ -11,7 +11,7 @@ ifeq ($(LDFLAGS),)
 	LDFLAGS= -pthread -lrt
 endif
 
-#Recipe to compile writer.c
+#Recipe to compile
 all:Client_OP Server_OP Hello_OP Uart_write_OP Uart_read_OP Temperature_i2c_OP Uart_raspi_OP Uart_readwrite_OP Uart_Rasp_ARD_WR_OP All_Task_OP All_Data_Sync_OP User_modes_OP
 
 

@@ -55,7 +55,7 @@ User_modes_OP:./User_modes/Comparison_mode
 	$(CC) $(CFLAGS) -o Comparison_mode ./User_modes/Comparison_mode.c
 
 main_OP:./I2C_Data_BB/main
-	$(CC) $(CFLAGS) -o main ./I2C_Data_BB/main.c $(INCLUDES)
+	$(CC) $(CFLAGS) -o main ./I2C_Data_BB/main.c
 
 
 

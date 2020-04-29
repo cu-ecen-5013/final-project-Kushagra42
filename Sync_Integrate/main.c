@@ -477,12 +477,13 @@ int main(int argc, char *argv[])
 		ARD_Sensor = ARD_temp;
 		Raspi_Sensor = RASP_temp;
 		
-		int Sensor_Selected_Value = User_Modes(I2C_Sensor,ARD_Sensor,Raspi_Sensor);
+		//int Sensor_Selected_Value = User_Modes(I2C_Sensor,ARD_Sensor,Raspi_Sensor);
 		
 		//***********Sending Comparison Analysis data ove socket******
 		printf("I2C_Sensor: %.2d\nARD_Sensor: %.2d\nRaspi_Sensor: %.2d\n",I2C_Sensor,ARD_Sensor,Raspi_Sensor);	// CHANGE TO SYSLOG
-		snprintf(&client_msg[0], 500, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor_Selected_Value: %.2d\nSensor Message: %.2s\n",ARD_temp, RASP_temp, 					LOCAL_temp,Sensor_Selected_Value,msg);
-		Client_Data(&client_msg[0], 500);
+		//snprintf(&client_msg[0], 500, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor_Selected_Value: %.2d\nSensor Message: %.2s\n",ARD_temp, RASP_temp, 					LOCAL_temp,Sensor_Selected_Value,msg);
+		
+		Client_Data(msg, 500);
 		// Dynamic Time Buffer End....
 	}
 	    	

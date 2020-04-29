@@ -475,16 +475,16 @@ int main(int argc, char *argv[])
 	uint32_t sleep_time;
 	char client_msg[500];
 	
-	int j;
+	//int j;
 
 /*********************BME280***********************/
-	j = bme280Init(1, 0x76);
+	/*j = bme280Init(1, 0x76);
 	if (j != 0)
 	{
 		return -1; // problem - quit
 	}
 	printf("BME280 device successfully opened.\n");
-	usleep(1000000); // wait for data to settle for first read
+	usleep(1000000); // wait for data to settle for first read*/
 	
 /*********************BME280***********************/
 	
@@ -512,7 +512,7 @@ int main(int argc, char *argv[])
 		
 		if(UART_send_cmd(&ARD_file) == false)	printf("UART for ARD failed to Send... Path: %s\n", ARD_UART_PATH);
 		if(UART_send_cmd(&RASP_file) == false)	printf("UART for RASP failed to Send... Path: %s\n", RASP_UART_PATH);
-		LOCAL_temp = bme280ReadValues();
+		//LOCAL_temp = bme280ReadValues();
 	        
 				
 		if(UART_receive_temp(&ARD_file, &ARD_temp) == false)	printf("UART for ARD failed to Read... Path: %s\n", ARD_UART_PATH);
@@ -533,7 +533,7 @@ int main(int argc, char *argv[])
 		
 		//***********Sending Comparison Analysis data ove socket******
 		printf("I2C_Sensor: %.2d\nARD_Sensor: %.2d\nRaspi_Sensor: %.2d\n",I2C_Sensor,ARD_Sensor,Raspi_Sensor);	// CHANGE TO SYSLOG
-		snprintf(&client_msg[0], 500, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor_Selected_Value: %.2d\nSensor Message: %.2s\n",ARD_temp, RASP_temp, 				LOCAL_temp,Sensor_Selected_Value,msg);
+		snprintf(&client_msg[0], 500, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor_Selected_Value: %.2d\nSensor Message: %.2s\n",ARD_temp, RASP_temp, 					LOCAL_temp,Sensor_Selected_Value,msg);
 		Client_Data(&client_msg[0], 500);
 		// Dynamic Time Buffer End....
 	}

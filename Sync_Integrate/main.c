@@ -178,6 +178,7 @@ int User_Modes(int sensor1,int sensor2,int sensor3,char *user_mode)
 {
 
 int argument = atoi(user_mode);
+printf("user mode:%d",argument);
 if(argument == 0)
 {
 printf("In comparison mode\n");
@@ -435,7 +436,7 @@ int main(int argc, char *argv[])
 
 /*********************Checking if argument was passed**************************/
 
-if(argc < 1)
+if(argc < 2)
 {
 	printf("PLease give the USER MODE 0:Comparison mode 1:Reference mode 2:Statistic mode\n");
 }

@@ -162,9 +162,9 @@ receive[count]='\0';
 //close(file);
 
 ////////
-///if (strchr(receive,'1'))
-///{
-//usleep(20000);
+if (strchr(receive,'1'))
+{
+usleep(20000);
 ///////
 //////////////////////////////
 ///			int return_read=uart_read();
@@ -273,12 +273,12 @@ serial.c_cflag = B115200 | CS8 | CREAD|CLOCAL;
     close(fd);
 
 
+}
 
-///}
-///else
-///{
-///printf("\nwaiting for bb data\n");
-///}
+else
+{
+printf("\nwaiting for bb data\n");
+}
 
 
 

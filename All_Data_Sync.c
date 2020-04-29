@@ -59,13 +59,25 @@
 //#define COMPARISON_MODE
 /************************USER MODES********************************/
 
+//#define 	DELTA_MIN	0.5
 
-char *msg;
+/*
+
+mode 1 - compare
+mode 2 - ref with other 2 - comapre with fixed range acceptance
+mode 3 - closest 2 
+
+
+*/
+
+//float val1, val2, val3;
+//
+//if((val1 >= (val2 + DELTA)) || (val1 <= (val2 - DELTA)))	
+
+char msg[200];
 static int file_i2c = 0;
 // Sensor calibration data
 static int calT1,calT2,calT3;
-static int calP1, calP2, calP3, calP4, calP5, calP6, calP7, calP8, calP9;
-static int calH1, calH2, calH3, calH4, calH5, calH6;
 
 int bme280Init(int iChannel, int iAddr)
 {
@@ -120,41 +132,6 @@ char filename[32];
 	if (calT2 > 32767) calT2 -= 65536; // negative value
 	calT3 = ucCal[4] + (ucCal[5] << 8);
 	if (calT3 > 32767) calT3 -= 65536;
-	
-	// Prepare pressure calibration data
-	calP1 = ucCal[6] + (ucCal[7] << 8);
-	calP2 = ucCal[8] + (ucCal[9] << 8);
-	if (calP2 > 32767) calP2 -= 65536; // signed short
-	calP3 = ucCal[10] + (ucCal[11] << 8);
-	if (calP3 > 32767) calP3 -= 65536;
-	calP4 = ucCal[12] + (ucCal[13] << 8);
-	if (calP4 > 32767) calP4 -= 65536;
-	calP5 = ucCal[14] + (ucCal[15] << 8);
-	if (calP5 > 32767) calP5 -= 65536;
-	calP6 = ucCal[16] + (ucCal[17] << 8);
-	if (calP6 > 32767) calP6 -= 65536;
-	calP7 = ucCal[18] + (ucCal[19] << 8);
-	if (calP7 > 32767) calP7 -= 65536;
-	calP8 = ucCal[20] + (ucCal[21] << 8);
-	if (calP8 > 32767) calP8 -= 65536;
-	calP9 = ucCal[22] + (ucCal[23] << 8);
-	if (calP9 > 32767) calP9 -= 65536;
-
-	// Prepare humidity calibration data
-	calH1 = ucCal[24];
-	calH2 = ucCal[25] + (ucCal[26] << 8);
-	if (calH2 > 32767) calH2 -= 65536;
-	calH3 = ucCal[27];
-	calH4 = (ucCal[28] << 4) + (ucCal[29] & 0xf);
-	if (calH4 > 2047) calH4 -= 4096; // signed 12-bit
-	calH5 = (ucCal[30] << 4) + (ucCal[29] >> 4);
-	if (calH5 > 2047) calH5 -= 4096;
-	calH6 = ucCal[31];
-	if (calH6 > 127) calH6 -= 256; // signed char
-
-	ucTemp[0] = 0xf2; // control humidity register
-	ucTemp[1] = 0x01; // humidity over sampling rate = 1
-	rc = write(file_i2c, ucTemp, 2);
 
 	ucTemp[0] = 0xf4; // control measurement register
 	ucTemp[1] = 0x27; // normal mode, temp and pressure over sampling rate=1
@@ -169,14 +146,13 @@ char filename[32];
 
 } 
 
-int bme280ReadValues(int *T, int *P, int *H)
+int bme280ReadValues(int *T)
 {
 unsigned char ucTemp[16];
 int i,rc;
-int t, p, h; // raw sensor values
+int t; // raw sensor values
 int var1,var2,t_fine;
-int64_t P_64;
-int64_t var1_64, var2_64;
+
 
 
 	ucTemp[0] = 0xf7; // start of data registers we want
@@ -186,46 +162,13 @@ int64_t var1_64, var2_64;
 	{
 		return -1; // something went wrong
 	}
-	p = (ucTemp[0] << 12) + (ucTemp[1] << 4) + (ucTemp[2] >> 4);
 	t = (ucTemp[3] << 12) + (ucTemp[4] << 4) + (ucTemp[5] >> 4);
-	h = (ucTemp[6] << 8) + ucTemp[7];
 
 	var1 = ((((t >> 3) - (calT1 <<1))) * (calT2)) >> 11;
 	var2 = (((((t >> 4) - (calT1)) * ((t>>4) - (calT1))) >> 12) * (calT3)) >> 14;
 	t_fine = var1 + var2;
 	*T = (t_fine * 5 + 128) >> 8;
-	*T = *T * (9/5) + 32;
    	
-
-	// Calculate calibrated pressure value
-	var1_64 = t_fine - 128000;
-	var2_64 = var1_64 * var1_64 * (int64_t)calP6;
-	var2_64 = var2_64 + ((var1_64 * (int64_t)calP5) << 17);
-	var2_64 = var2_64 + (((int64_t)calP4) << 35);
-	var1_64 = ((var1_64 * var1_64 * (int64_t)calP3)>>8) + ((var1_64 * (int64_t)calP2)<<12);
-	var1_64 = (((((int64_t)1)<<47)+var1_64))*((int64_t)calP1)>>33;
-	if (var1_64 == 0)
-	{
-		*P = 0;
-	}
-	else
-	{
-		P_64 = 1048576 - p;
-		P_64 = (((P_64<<31)-var2_64)*3125)/var1_64;
-		var1_64 = (((int64_t)calP9) * (P_64>>13) * (P_64>>13)) >> 25;
-		var2_64 = (((int64_t)calP8) * P_64) >> 19;
-		P_64 = ((P_64 + var1_64 + var2_64) >> 8) + (((int64_t)calP7)<<4);
-		*P = (int)P_64 / 100;
-	}
-	// Calculate calibrated humidity value
-	var1 = (t_fine - 76800);
-	var1 = (((((h << 14) - ((calH4) << 20) - ((calH5) * var1)) + 
-		(16384)) >> 15) * (((((((var1 * (calH6)) >> 10) * (((var1 * (calH3)) >> 11) + (32768))) >> 10) + (2097152)) * (calH2) + 8192) >> 14));
-	var1 = (var1 - (((((var1 >> 15) * (var1 >> 15)) >> 7) * (calH1)) >> 4));
-	var1 = (var1 < 0? 0 : var1);
-	var1 = (var1 > 419430400 ? 419430400 : var1);
-	*H = var1 >> 12;
-
 	return *T;
 
 } 
@@ -237,32 +180,32 @@ int User_Modes(int sensor1,int sensor2,int sensor3)
 
 	if ((sensor1 == sensor2 && sensor1 == sensor3)||(sensor1 == sensor2 && sensor2 == sensor3))
 	{
-		printf("All sensor data are same %d", sensor1);
-		msg = "All sensor data are same";
+		sprintf(msg, "All sensor data are same %d\n", sensor1);
+		printf("%s", msg);
 		return sensor1;
 	}
 	else if (sensor1 == sensor2 && sensor1 != sensor3)
 	{
-		printf("sensor1 and sensor2 data are same %d", sensor1);
-		msg = "sensor1 and sensor2 data are same";
+		sprintf(msg, "sensor1 and sensor2 data are same %d\n", sensor1);
+		printf("%s", msg);
 		return sensor1;
 	}
 	else if (sensor1 != sensor2 && sensor2 == sensor3)
 	{
-		printf("sensor2 and sensor3 data are same %d", sensor2);
-		msg = "sensor2 and sensor3 data are same";
+		sprintf(msg, "sensor2 and sensor3 data are same %d\n", sensor2);
+		printf("%s", msg);
 		return sensor2;
 	}
 	else if (sensor1 != sensor2 && sensor1 == sensor3)
 	{
-		printf("sensor1 and sensor3 data are same %d", sensor3);
-		msg = "sensor1 and sensor3 data are same";
+		sprintf(msg, "sensor1 and sensor3 data are same %d\n", sensor3);
+		printf("%s", msg);
 		return sensor3;
 	}
 	else 
 	{
-		printf("All are Faulty Values");
-		msg = "All are Faulty Values";
+		sprintf(msg, "All are Faulty Values\n");
+		printf("%s", msg);
 		return 0;
 	}
 #endif
@@ -270,32 +213,32 @@ int User_Modes(int sensor1,int sensor2,int sensor3)
 #ifdef REFERENCE_MODE
 	if((sensor1 == sensor3) && (sensor2==sensor3))
 	{
-		printf("All sensor data is correct\n");
-		msg = "All sensor data is correct";
+		sprintf(msg, "All sensor data is correct\n");
+		printf("%s", msg);
 		return sensor3;
 	}
 	else if((sensor1 != sensor3) && (sensor2 == sensor3))
 	{
-		printf("Sensor 1 data is wrong\n");
-		msg = "Sensor 1 data is wrong";
+		sprintf(msg, "Sensor 1 data is wrong\n");
+		printf("%s", msg);
 		return sensor3;
 	}
 	else if((sensor1 == sensor3) && (sensor2 != sensor3))
 	{
-		printf("Sensor 2 data is wrong\n");
-		msg = "Sensor 2 data is wrong";
+		sprintf(msg, "Sensor 2 data is wrong\n");
+		printf("%s", msg);
 		return sensor3;
 	}
   	else if((sensor1 == sensor2) && (sensor1 != sensor3))
 	{
-		printf("Sensor 3 data is wrong\n");
-		msg = "Sensor 3 data is wrong";
+		sprintf(msg, "Sensor 3 data is wrong\n");
+		printf("%s", msg);
 		return sensor3;
 	}
 	else
 	{
-		printf("All 3 sensors have different values\n");
-		msg = "All 3 sensors have different values, Considering reference sensor";
+		sprintf(msg, "All 3 sensors have different values, Considering reference sensor\n");
+		printf("%s", msg);
 		return sensor3;
 	}
 
@@ -307,43 +250,43 @@ int User_Modes(int sensor1,int sensor2,int sensor3)
 
 	if(((sensor1 == sensor2) && (sensor1 == sensor3))||((sensor1 == sensor2) && (sensor2 == sensor3)))
 	{
-		printf("Final value will be average of all 3 sensors\n");
-		msg = "Final value will be average of all 3 sensors";
+		sprintf(msg, "Final value will be average of all 3 sensors\n");
+		printf("%s", msg);
 		int avg_temp = (sensor1 + sensor2 + sensor3)/3;
 		return avg_temp;
 	}
 	else if((sensor1 == sensor2+1 || sensor1 == sensor2-1) && (sensor1 == sensor3+2 || sensor1 == sensor3-2) && (sensor2 == sensor3+1 || sensor3 == sensor3-1))
 	{
-		printf("All sensor values are in range\n");
-		msg = "All sensor values are in range";
+		sprintf(msg, "All sensor values are in range\n");
+		printf("%s", msg);
 		int avg_temp = (sensor1 + sensor2 + sensor3)/3;
 		return avg_temp;
 	}
 	else if((sensor1 == sensor2+1 || sensor1 ==  sensor2-1) && (sensor1 != sensor3+2 || sensor1 != sensor3-2) && (sensor2 != sensor3+1 || sensor3 != sensor3-1))
 	{
-		printf("Sensor 3 is not in range\n");
-		msg = "Sensor 3 is not in range";
+		sprintf(msg, "Sensor 3 is not in range\n");
+		printf("%s", msg);
 		int avg_temp = (sensor1 + sensor2)/2;
 		return avg_temp;
 	}
 	else if((sensor1 != sensor2+1 || sensor1 != sensor2-1) && (sensor1 == sensor3+1 || sensor1 == sensor3-1) && (sensor2 != sensor3+1 || sensor3 != sensor3-1))
 	{
-		printf("Sensor 2 is not in range\n");
-		msg = "Sensor 2 is not in range";
+		sprintf(msg, "Sensor 2 is not in range\n");
+		printf("%s", msg);
 		int avg_temp = (sensor1 + sensor3)/2;
 		return avg_temp;
 	}
 	else if((sensor1 != sensor2+1 || sensor1 != sensor2-1) && (sensor1 != sensor3+1 || sensor1 != sensor3-1) && (sensor2 == sensor3+1 || sensor3 == sensor3-1))
 	{
-		printf("Sensor 1 is not in range\n");
-		msg = "Sensor 1 is not in range";
+		sprintf(msg, "Sensor 1 is not in range\n");
+		printf("%s", msg);
 		int avg_temp = (sensor3 + sensor2)/2;
 		return avg_temp;
 	}
 	else
 	{
-		printf("All are Faulty Values");
-		msg = "All are Faulty Values";
+		sprintf(msg, "All are Faulty Values\n");
+		printf("%s", msg);
 		return 0;
 	}
 
@@ -522,7 +465,7 @@ int main(int argc, char *argv[])
 	char client_msg[200];
 	
 	int j;
-	int T, P, H; // calibrated values
+	int T; // calibrated values
 
 /*********************BME280***********************/
 	j = bme280Init(1, 0x76);
@@ -559,7 +502,7 @@ int main(int argc, char *argv[])
 		
 		if(UART_send_cmd(&ARD_file) == false)	printf("UART for ARD failed to Send... Path: %s\n", ARD_UART_PATH);
 		if(UART_send_cmd(&RASP_file) == false)	printf("UART for RASP failed to Send... Path: %s\n", RASP_UART_PATH);
-		LOCAL_temp = bme280ReadValues(&T, &P, &H);
+		LOCAL_temp = ((float)bme280ReadValues(&T)) / 100;
 	        
 				
 		if(UART_receive_temp(&ARD_file, &ARD_temp) == false)	printf("UART for ARD failed to Read... Path: %s\n", ARD_UART_PATH);
@@ -584,10 +527,7 @@ int main(int argc, char *argv[])
 		
 		//***********Sending Comparison Analysis data ove socket******
 		printf("I2C_Sensor: %.2d\nARD_Sensor: %.2d\nRaspi_Sensor: %.2d\n",I2C_Sensor,ARD_Sensor,Raspi_Sensor);	// CHANGE TO SYSLOG
-		snprintf(&client_msg[0], 200, "Sensor_Selected_Value: %.2d\n",Sensor_Selected_Value);
-		Client_Data(&client_msg[0], 200);
-
-		snprintf(&client_msg[0], 200, "Sensor Fault detection message: %.2s\n",msg);
+		snprintf(&client_msg[0], 200, "Sensor_Selected_Value: %.2d\nSensor Fault detection message: %.2s\n",Sensor_Selected_Value,msg);
 		Client_Data(&client_msg[0], 200);
 		// Dynamic Time Buffer End....
 	}
@@ -606,4 +546,5 @@ return 0;
 
 
 }
+
 

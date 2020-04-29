@@ -442,6 +442,25 @@ if(argc < 2)
 }
 else
 {
+	if(strcmp(argv[1],"0")==0)
+	{
+		printf("mode selected:0\n");
+
+	}
+	else if(strcmp(argv[1],"1")==0)
+	{
+		printf("mode selected:1\n");
+
+	}
+	else if(strcmp(argv[1],"2")==0)
+	{
+		printf("mode selected:2\n");
+	}
+	else
+	{
+		printf("unrecognized mode\n");
+	}
+	
 /*********************BME280***********************/
 	j = bme280Init(1, 0x76);
 	if (j != 0)
@@ -459,7 +478,7 @@ else
 			
 	Socket_Init();
 
-	for(i = 0; i < 5; i++)
+	for(i = 0; i < 500; i++)
 	{
 		
 				

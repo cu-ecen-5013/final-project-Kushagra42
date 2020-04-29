@@ -322,7 +322,7 @@ void Socket_Init()
 }
 int Client_Data(char *str, uint32_t len)
 {
-	printf("*******STR*********%s\n",str);
+	
 	char buf[500];
 	strncpy(buf, str, len);
 	uint32_t cnt = 0, resp = 0;;
@@ -337,7 +337,7 @@ int Client_Data(char *str, uint32_t len)
 		cnt += resp;
    } while(cnt < len);
    
-     printf("*******BUF*********%s\n",buf);
+     
 
      return 0;
    
@@ -481,10 +481,10 @@ int main(int argc, char *argv[])
 		User_Modes(I2C_Sensor,ARD_Sensor,Raspi_Sensor);
 
 		//***********Sending Comparison Analysis data ove socket******
-		printf("I2C_Sensor: %.2d\nARD_Sensor: %.2d\nRaspi_Sensor: %.2d\n",I2C_Sensor,ARD_Sensor,Raspi_Sensor);	// CHANGE TO SYSLOG
-		//snprintf(&client_msg[0], 500, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor_Selected_Value: %.2d\nSensor Message: %.2s\n",ARD_temp, RASP_temp, 					LOCAL_temp,Sensor_Selected_Value,msg);
+		printf("I2C_Sensor: %.2d\nARD_Sensor: %.2d\nRaspi_Sensor: %.2d\n",I2C_Sensor,ARD_Sensor,Raspi_Sensor);	// CHANGE TO SYSLOG/
+		snprintf(&client_msg[0], 500, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor Message: %.2s\n\n",ARD_temp, RASP_temp, LOCAL_temp,msg);
 		
-		Client_Data(msg, strlen(msg));
+		Client_Data(client_msg, strlen(client_msg));
 		// Dynamic Time Buffer End....
 	}
 	    	

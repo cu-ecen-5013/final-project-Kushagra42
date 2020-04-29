@@ -51,7 +51,7 @@
 #define DELAY 1000000
 
 /************************USER MODES********************************/
-#define REFERENCE_MODE
+//#define REFERENCE_MODE
 //#define STATISTIC_MODE
 //#define COMPARISON_MODE
 /************************USER MODES********************************/
@@ -75,6 +75,7 @@ char msg[200];
 static int file_i2c = 0;
 // Sensor calibration data
 static int calT1,calT2,calT3;
+
 
 int bme280Init(int iChannel, int iAddr)
 {
@@ -131,7 +132,7 @@ char filename[32];
 	if (calT3 > 32767) calT3 -= 65536;
 
 	ucTemp[0] = 0xf4; // control measurement register
-	ucTemp[1] = 0x27; // normal mode, temp and pressure over sampling rate=1
+	ucTemp[1] = 0x27; // normal mode, temp over sampling rate=1
 	rc = write(file_i2c, ucTemp, 2);
 
 	ucTemp[0] = 0xf5; // CONFIG
@@ -173,11 +174,12 @@ int var1,var2,t_fine, temp_shift;
 	return temp;
 } 
 
-int User_Modes(int sensor1,int sensor2,int sensor3)
+int User_Modes(int sensor1,int sensor2,int sensor3,char *user_mode)
 {
 
-#ifdef COMAPRISON_MODE
-
+int argument = atoi(user_mode);
+if(argument == 0)
+{
 	if ((sensor1 == sensor2 && sensor1 == sensor3)||(sensor1 == sensor2 && sensor2 == sensor3))
 	{
 		sprintf(msg, "All sensor data are same %d\n", sensor1);
@@ -208,9 +210,12 @@ int User_Modes(int sensor1,int sensor2,int sensor3)
 		printf("%s", msg);
 		return 0;
 	}
-#endif
+}
 
-#ifdef REFERENCE_MODE
+
+if(argument == 1)
+{
+
 	if((sensor1 == sensor3) && (sensor2==sensor3))
 	{
 		sprintf(msg, "All sensor data is correct\n");
@@ -242,11 +247,11 @@ int User_Modes(int sensor1,int sensor2,int sensor3)
 		return sensor3;
 	}
 
+}
 
 
-#endif
-
-#ifdef STATISTIC_MODE
+if(argument == 2)
+{
 
 	if(((sensor1 == sensor2) && (sensor1 == sensor3))||((sensor1 == sensor2) && (sensor2 == sensor3)))
 	{
@@ -289,8 +294,9 @@ int User_Modes(int sensor1,int sensor2,int sensor3)
 		printf("%s", msg);
 		return 0;
 	}
+}
 
-#endif
+return 0;
 }
 
 
@@ -426,6 +432,14 @@ int main(int argc, char *argv[])
 	
 	int j;
 
+/*********************Checking if argument was passed**************************/
+
+if(argc < 1)
+{
+	printf("PLease give the USER MODE 0:Comparison mode 1:Reference mode 2:Statistic mode\n");
+}
+else
+{
 /*********************BME280***********************/
 	j = bme280Init(1, 0x76);
 	if (j != 0)
@@ -439,11 +453,11 @@ int main(int argc, char *argv[])
 	
 	if(UART_periph_init(&ARD_file, ARD_UART_PATH) == false)		printf("UART for ARD failed to Initialize... Path: %s\n", ARD_UART_PATH);
 	
-	if(UART_periph_init(&RASP_file, RASP_UART_PATH) == false)		printf("UART for RASP failed to Initialize... Path: %s\n", RASP_UART_PATH);
+	if(UART_periph_init(&RASP_file, RASP_UART_PATH) == false)	printf("UART for RASP failed to Initialize... Path: %s\n", RASP_UART_PATH);
 			
 	Socket_Init();
 
-	for(i = 0; i < 10; i ++)
+	for(i = 0; i < 5; i++)
 	{
 		
 				
@@ -470,7 +484,7 @@ int main(int argc, char *argv[])
 		Raspi_Sensor = RASP_temp;
 		
 		//int Sensor_Selected_Value = User_Modes(I2C_Sensor,ARD_Sensor,Raspi_Sensor);
-		User_Modes(I2C_Sensor,ARD_Sensor,Raspi_Sensor);
+		User_Modes(I2C_Sensor,ARD_Sensor,Raspi_Sensor,*argv);
 
 		//***********Sending Comparison Analysis data ove socket******
 		tmp = (int)(RASP_temp) % 100;
@@ -498,6 +512,7 @@ int main(int argc, char *argv[])
 	
 	printf("Exiting...");
 	exit(0);
+}
 return 0;
 
 

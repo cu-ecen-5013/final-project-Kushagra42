@@ -324,7 +324,7 @@ int Client_Data(char *str, uint32_t len)
 {
 
 	char buf[500];
-	strcpy(buf, str);
+	strncpy(buf, str, len);
 	uint32_t cnt = 0, resp = 0;;
 
    do{
@@ -483,7 +483,7 @@ int main(int argc, char *argv[])
 		printf("I2C_Sensor: %.2d\nARD_Sensor: %.2d\nRaspi_Sensor: %.2d\n",I2C_Sensor,ARD_Sensor,Raspi_Sensor);	// CHANGE TO SYSLOG
 		//snprintf(&client_msg[0], 500, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor_Selected_Value: %.2d\nSensor Message: %.2s\n",ARD_temp, RASP_temp, 					LOCAL_temp,Sensor_Selected_Value,msg);
 		
-		Client_Data(msg, 500);
+		Client_Data(msg, strlen(msg));
 		// Dynamic Time Buffer End....
 	}
 	    	

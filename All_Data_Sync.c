@@ -469,7 +469,7 @@ int main(int argc, char *argv[])
 	
 	int ARD_file, RASP_file, resp;
 	uint8_t i;
-	float LOCAL_temp, ARD_temp, RASP_temp;
+	float LOCAL_temp=0, ARD_temp, RASP_temp=0;
 	int I2C_Sensor, ARD_Sensor, Raspi_Sensor;
 	struct timespec prev_t;
 	uint32_t sleep_time;
@@ -533,7 +533,7 @@ int main(int argc, char *argv[])
 		
 		//***********Sending Comparison Analysis data ove socket******
 		printf("I2C_Sensor: %.2d\nARD_Sensor: %.2d\nRaspi_Sensor: %.2d\n",I2C_Sensor,ARD_Sensor,Raspi_Sensor);	// CHANGE TO SYSLOG
-		snprintf(&client_msg[0], 500, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor_Selected_Value: %.2d\nSensor Message: %.2s\n",ARD_temp, RASP_temp, LOCAL_temp,Sensor_Selected_Value,msg);
+		snprintf(&client_msg[0], 500, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor_Selected_Value: %.2d\nSensor Message: %.2s\n",ARD_temp, RASP_temp, 				LOCAL_temp,Sensor_Selected_Value,msg);
 		Client_Data(&client_msg[0], 500);
 		// Dynamic Time Buffer End....
 	}

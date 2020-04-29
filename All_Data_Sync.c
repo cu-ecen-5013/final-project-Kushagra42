@@ -152,7 +152,7 @@ unsigned char ucTemp[16];
 int i,rc;
 int t; // raw sensor values
 float temp;
-int var1,var2,t_fine;
+int var1,var2,t_fine, temp_shift;
 
 
 
@@ -168,8 +168,8 @@ int var1,var2,t_fine;
 	var1 = ((((t >> 3) - (calT1 <<1))) * (calT2)) >> 11;
 	var2 = (((((t >> 4) - (calT1)) * ((t>>4) - (calT1))) >> 12) * (calT3)) >> 14;
 	t_fine = var1 + var2;
-	temp = (t_fine * 5 + 128) >> 8;
-	temp /= 100;
+	temp_shift = (t_fine * 5 + 128) >> 8;
+	temp = temp_shift / 100;
 	temp *= 1.8;
 	temp += 32;
 	

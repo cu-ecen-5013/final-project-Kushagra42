@@ -146,7 +146,7 @@ char filename[32];
 
 } 
 
-int bme280ReadValues()
+float bme280ReadValues()
 {
 unsigned char ucTemp[16];
 int i,rc;

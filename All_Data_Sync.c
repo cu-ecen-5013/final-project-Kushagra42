@@ -146,11 +146,12 @@ char filename[32];
 
 } 
 
-int bme280ReadValues(int *T)
+int bme280ReadValues()
 {
 unsigned char ucTemp[16];
 int i,rc;
 int t; // raw sensor values
+float temp;
 int var1,var2,t_fine;
 
 
@@ -167,10 +168,12 @@ int var1,var2,t_fine;
 	var1 = ((((t >> 3) - (calT1 <<1))) * (calT2)) >> 11;
 	var2 = (((((t >> 4) - (calT1)) * ((t>>4) - (calT1))) >> 12) * (calT3)) >> 14;
 	t_fine = var1 + var2;
-	*T = (t_fine * 5 + 128) >> 8;
-   	
-	return *T;
-
+	temp = (t_fine * 5 + 128) >> 8;
+	temp /= 100;
+	temp *= 1.8;
+	temp += 32;
+	
+	return temp;
 } 
 
 int User_Modes(int sensor1,int sensor2,int sensor3)
@@ -319,12 +322,20 @@ void Socket_Init()
 int Client_Data(char *str, uint32_t len)
 {
 
+	char buf[500];
+	strcpy(buf, str);
+	uint32_t cnt = 0, resp = 0;;
+
+   do{
+		resp = send(new_socket, buf, len, 0);
+		if(resp < 0)
+		{
+			perror("send\n");
+			return -1;
+		}
+		cnt += resp;
+   } while(cnt < len);
    
-    if (send(new_socket, str, len, 0) == -1)
-     {
-         perror("send");
-         exit (1);
-     }
      printf("After the send function \n");
 
      return 0;
@@ -465,7 +476,6 @@ int main(int argc, char *argv[])
 	char client_msg[500];
 	
 	int j;
-	int T; // calibrated values
 
 /*********************BME280***********************/
 	j = bme280Init(1, 0x76);
@@ -502,7 +512,7 @@ int main(int argc, char *argv[])
 		
 		if(UART_send_cmd(&ARD_file) == false)	printf("UART for ARD failed to Send... Path: %s\n", ARD_UART_PATH);
 		if(UART_send_cmd(&RASP_file) == false)	printf("UART for RASP failed to Send... Path: %s\n", RASP_UART_PATH);
-		LOCAL_temp = ((float)bme280ReadValues(&T)) / 100;
+		LOCAL_temp = bme280ReadValues();
 	        
 				
 		if(UART_receive_temp(&ARD_file, &ARD_temp) == false)	printf("UART for ARD failed to Read... Path: %s\n", ARD_UART_PATH);

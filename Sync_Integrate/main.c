@@ -323,15 +323,15 @@ void Socket_Init()
 int Client_Data(char *str, uint32_t len)
 {
 	
-	/*char buf[500];
+	char buf[500];
 	memset(buf,0,500);
 
-	strncpy(buf, str, len);*/
+	strncpy(buf, str, len);
 	//uint32_t cnt = 0;
 	uint32_t resp = 0;
 
    //do{
-		resp = send(new_socket, str, len, 0);
+		resp = send(new_socket, buf, len, 0);
 		if(resp < 0)
 		{
 			perror("send\n");

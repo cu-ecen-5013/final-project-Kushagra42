@@ -338,7 +338,7 @@ int Client_Data(char *str, uint32_t len)
 		}
 		cnt += resp;
    } while(cnt < len);
-   
+   printf("client data out of while\n");	
      
 
      return 0;
@@ -427,7 +427,7 @@ int main(int argc, char *argv[])
 	float LOCAL_temp=0, ARD_temp, RASP_temp=0;
 	int I2C_Sensor, ARD_Sensor, Raspi_Sensor;
 	struct timespec prev_t;
-
+	int tmp;
 	char client_msg[500];
 	
 	int j;
@@ -449,9 +449,9 @@ int main(int argc, char *argv[])
 			
 	Socket_Init();
 
-	for(i = 0; i < 5; i ++)
+	for(i = 0; i < 10; i ++)
 	{
-		
+		printf("START FOR\n");
 		// Add a fix offset to previous absoulte time
 		prev_t.tv_sec = prev_t.tv_sec + SYNC_TIME_S;
 
@@ -459,14 +459,14 @@ int main(int argc, char *argv[])
 		
 		hr_dynamic_time_buffer_wait(SYNC_TIME_S);
 		// Dynamic Time Buffer Start....
-		
+		printf("After Dynamic wait\n");	
 		if(UART_send_cmd(&ARD_file) == false)	printf("UART for ARD failed to Send... Path: %s\n", ARD_UART_PATH);
 		if(UART_send_cmd(&RASP_file) == false)	printf("UART for RASP failed to Send... Path: %s\n", RASP_UART_PATH);
 		LOCAL_temp = bme280ReadValues();
 	        
-				
+		printf("UART Sent I2C read\n");		
 		if(UART_receive_temp(&ARD_file, &ARD_temp) == false)	printf("UART for ARD failed to Read... Path: %s\n", ARD_UART_PATH);
-
+		printf("After ARD UART receive\n");	
 		if(UART_receive_temp(&RASP_file, &RASP_temp) == false)	printf("UART for RASP failed to Read... Path: %s\n", RASP_UART_PATH);
 		
 		// *********** TEMPERATURE COMPARING ***********
@@ -483,12 +483,18 @@ int main(int argc, char *argv[])
 		User_Modes(I2C_Sensor,ARD_Sensor,Raspi_Sensor);
 
 		//***********Sending Comparison Analysis data ove socket******
-		snprintf(&rasp_msg[0], sizeof(rasp_msg), "Rasp: %d.%d\n", (int)(RASP_temp / 100), (int)(RASP_temp) % 100);
-		snprintf(&ard_msg[0], sizeof(ard_msg), "Ard: %d.%d\n", (int)(ARD_temp / 100), (int)(ARD_temp) % 100);
-		snprintf(&local_msg[0], sizeof(local_msg), "Local: %d.%d\n", (int)(LOCAL_temp / 100), (int)(LOCAL_temp) % 100);
+		tmp = (int)(RASP_temp) % 100;
+		snprintf(&rasp_msg[0], sizeof(rasp_msg), "Rasp: %d.%d\n", tmp, (int)((RASP_temp - tmp) * 100));
+		
+		tmp = (int)(ARD_temp) % 100;
+		snprintf(&ard_msg[0], sizeof(ard_msg), "Ard: %d.%d\n", tmp, (int)((ARD_temp - tmp) * 100));
+		
+		tmp = (int)(LOCAL_temp) % 100;
+		snprintf(&local_msg[0], sizeof(local_msg), "Local: %d.%d\n", tmp, (int)((LOCAL_temp - tmp) * 100));
+
 		snprintf(&client_msg[0], sizeof(client_msg), "%s%s%s%s\n\n", rasp_msg, ard_msg, local_msg, msg);
 		Client_Data(&client_msg[0], strlen(client_msg));
-		// Dynamic Time Buffer End....
+		//Dynamic Time Buffer End....
 	}
 	    	
 	snprintf(&client_msg[0], 200, "EXIT");

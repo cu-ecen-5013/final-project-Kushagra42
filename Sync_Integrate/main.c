@@ -44,9 +44,9 @@
 #define MS_TO_NS		(uint32_t)1000000
 #define MS_TO_US		(uint32_t)1000
 
-#define SELECT_R_WAIT_MS	250//
+#define SELECT_R_WAIT_MS	300//
 
-#define SYNC_TIME_S		2//m*100
+#define SYNC_TIME_S		1//m*100
 #define ADDITIONAL_MS	100
 
 #define PORT 9000    /* the port client will be connecting to */
@@ -338,8 +338,7 @@ int Client_Data(char *str, uint32_t len)
 		}
 		cnt += resp;
    } while(cnt < len);
-   printf("client data out of while\n");	
-     
+       
 
      return 0;
    
@@ -451,22 +450,22 @@ int main(int argc, char *argv[])
 
 	for(i = 0; i < 10; i ++)
 	{
-		printf("START FOR\n");
+		
 		// Add a fix offset to previous absoulte time
 		prev_t.tv_sec = prev_t.tv_sec + SYNC_TIME_S;
 
 		// Sleep till the absolute time supplied by prev_t
 		
-		hr_dynamic_time_buffer_wait(SYNC_TIME_S);
+		hr_dynamic_time_buffer_wait(SYNC_TIME_S*1000);
 		// Dynamic Time Buffer Start....
-		printf("After Dynamic wait\n");	
+		
 		if(UART_send_cmd(&ARD_file) == false)	printf("UART for ARD failed to Send... Path: %s\n", ARD_UART_PATH);
 		if(UART_send_cmd(&RASP_file) == false)	printf("UART for RASP failed to Send... Path: %s\n", RASP_UART_PATH);
 		LOCAL_temp = bme280ReadValues();
 	        
-		printf("UART Sent I2C read\n");		
+			
 		if(UART_receive_temp(&ARD_file, &ARD_temp) == false)	printf("UART for ARD failed to Read... Path: %s\n", ARD_UART_PATH);
-		printf("After ARD UART receive\n");	
+		
 		if(UART_receive_temp(&RASP_file, &RASP_temp) == false)	printf("UART for RASP failed to Read... Path: %s\n", RASP_UART_PATH);
 		
 		// *********** TEMPERATURE COMPARING ***********

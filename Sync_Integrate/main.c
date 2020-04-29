@@ -322,7 +322,7 @@ void Socket_Init()
 }
 int Client_Data(char *str, uint32_t len)
 {
-
+	printf("*******STR*********%s\n",str);
 	char buf[500];
 	strncpy(buf, str, len);
 	uint32_t cnt = 0, resp = 0;;
@@ -337,7 +337,7 @@ int Client_Data(char *str, uint32_t len)
 		cnt += resp;
    } while(cnt < len);
    
-     printf("After the send function \n");
+     printf("*******BUF*********%s\n",buf);
 
      return 0;
    
@@ -488,6 +488,7 @@ int main(int argc, char *argv[])
 	}
 	    	
 	snprintf(&client_msg[0], 500, "EXIT");
+	printf("*******MSG*********%s\n",msg);
 	Client_Data(&client_msg[0], 500);
 
    	close(new_socket);

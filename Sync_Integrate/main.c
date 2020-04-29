@@ -323,22 +323,21 @@ void Socket_Init()
 int Client_Data(char *str, uint32_t len)
 {
 	
-	char buf[500];
-	memset(buf,0,500);
-
-	strncpy(buf, str, len);
-	//uint32_t cnt = 0;
+	//char buf[500];
+	//memset(buf,0,500);
+	//strncpy(buf, str, len);
+	uint32_t cnt = 0;
 	uint32_t resp = 0;
 
-   //do{
-		resp = send(new_socket, buf, len, 0);
+   do{
+		resp = send(new_socket, str, len, 0);
 		if(resp < 0)
 		{
 			perror("send\n");
 			return -1;
 		}
-		//cnt += resp;
-   //} while(cnt < len);
+		cnt += resp;
+   } while(cnt < len);
    
      
 
@@ -422,7 +421,7 @@ void UART_periph_close(int *file)
 
 int main(int argc, char *argv[])
 {
-	
+	char rasp_msg[20], ard_msg[20], local_msg[20];
 	int ARD_file, RASP_file;
 	uint8_t i;
 	float LOCAL_temp=0, ARD_temp, RASP_temp=0;
@@ -484,10 +483,10 @@ int main(int argc, char *argv[])
 		User_Modes(I2C_Sensor,ARD_Sensor,Raspi_Sensor);
 
 		//***********Sending Comparison Analysis data ove socket******
-		printf("I2C_Sensor: %.2d\nARD_Sensor: %.2d\nRaspi_Sensor: %.2d\n",I2C_Sensor,ARD_Sensor,Raspi_Sensor);	// CHANGE TO SYSLOG/
-		snprintf(&client_msg[0], 200, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor Message: %s\n\n",ARD_temp, RASP_temp, LOCAL_temp,msg);
-		
-		memset(client_msg,0,200);
+		snprintf(&rasp_msg[0], sizeof(rasp_msg), "Rasp: %d.%d\n", (int)(RASP_temp / 100), (int)(RASP_temp) % 100);
+		snprintf(&ard_msg[0], sizeof(ard_msg), "Ard: %d.%d\n", (int)(ARD_temp / 100), (int)(ARD_temp) % 100);
+		snprintf(&local_msg[0], sizeof(local_msg), "Local: %d.%d\n", (int)(LOCAL_temp / 100), (int)(LOCAL_temp) % 100);
+		snprintf(&client_msg[0], sizeof(client_msg), "%s%s%s%s\n\n", rasp_msg, ard_msg, local_msg, msg);
 		Client_Data(&client_msg[0], strlen(client_msg));
 		// Dynamic Time Buffer End....
 	}

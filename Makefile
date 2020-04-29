@@ -8,10 +8,14 @@ ifeq ($(CFLAGS),)
 endif
 
 #Recipe to compile
-all: Server_OP Temperature_i2c_OP Uart_raspi_OP All_Task_OP All_Data_Sync_OP User_modes_OP bme280_OP HRT_System_OP Client_OP
+all: Server_OP Temperature_i2c_OP Uart_raspi_OP All_Task_OP All_Data_Sync_OP User_modes_OP bme280_OP HRT_System_OP Client_OP TEST_OP
 
 Temperature_i2c_OP:./Temp_i2c/Temperature_i2c
 	$(CC) $(CFLAGS) -o Temperature_i2c ./Temp_i2c/Temperature_i2c.c
+
+
+TEST_OP:./Temp_i2c/TEST
+	$(CC) $(CFLAGS) -o TEST ./Temp_i2c/TEST.c
 
 Uart_raspi_OP:./Uart_rpi/Uart_raspi
 	$(CC) $(CFLAGS) -o Uart_raspi ./Uart_rpi/Uart_raspi.c
@@ -42,7 +46,7 @@ HRT_System_OP:./Sync_Integrate/main.c ./Sync_Integrate/hard_realtime.c
 
 #cleaning all the executable files
 clean:
-	rm -f *.o Server  Temperature_i2c ./Socket_Server/Server ./Socket_Client/Client UART2_Temp All_Data_Sync Comparison_mode /User_modes/Comparison_mode bme280 ./I2C_Data_BB/bme280 main
+	rm -f *.o Server  Temperature_i2c ./Socket_Server/Server ./Socket_Client/Client UART2_Temp All_Data_Sync Comparison_mode /User_modes/Comparison_mode bme280 ./I2C_Data_BB/bme280 main TEST
 
 
 

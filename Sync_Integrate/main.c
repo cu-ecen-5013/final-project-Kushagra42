@@ -323,19 +323,22 @@ void Socket_Init()
 int Client_Data(char *str, uint32_t len)
 {
 	
-	char buf[500];
-	strncpy(buf, str, len);
-	uint32_t cnt = 0, resp = 0;;
+	/*char buf[500];
+	memset(buf,0,500);
 
-   do{
-		resp = send(new_socket, buf, len, 0);
+	strncpy(buf, str, len);*/
+	//uint32_t cnt = 0;
+	uint32_t resp = 0;
+
+   //do{
+		resp = send(new_socket, str, len, 0);
 		if(resp < 0)
 		{
 			perror("send\n");
 			return -1;
 		}
-		cnt += resp;
-   } while(cnt < len);
+		//cnt += resp;
+   //} while(cnt < len);
    
      
 
@@ -484,6 +487,7 @@ int main(int argc, char *argv[])
 		printf("I2C_Sensor: %.2d\nARD_Sensor: %.2d\nRaspi_Sensor: %.2d\n",I2C_Sensor,ARD_Sensor,Raspi_Sensor);	// CHANGE TO SYSLOG/
 		snprintf(&client_msg[0], 200, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor Message: %s\n\n",ARD_temp, RASP_temp, LOCAL_temp,msg);
 		
+		memset(client_msg,0,200);
 		Client_Data(client_msg, strlen(client_msg));
 		// Dynamic Time Buffer End....
 	}

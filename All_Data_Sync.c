@@ -43,9 +43,9 @@
 #define MS_TO_NS		(uint32_t)1000000
 #define MS_TO_US		(uint32_t)1000
 
-#define SELECT_R_WAIT_MS	500//
+#define SELECT_R_WAIT_MS	250//
 
-#define SYNC_TIME_S		1//m*100
+#define SYNC_TIME_S		2//m*100
 #define ADDITIONAL_MS	100
 
 #define PORT 9000    /* the port client will be connecting to */
@@ -475,16 +475,16 @@ int main(int argc, char *argv[])
 	uint32_t sleep_time;
 	char client_msg[500];
 	
-	//int j;
+	int j;
 
 /*********************BME280***********************/
-	/*j = bme280Init(1, 0x76);
+	j = bme280Init(1, 0x76);
 	if (j != 0)
 	{
 		return -1; // problem - quit
 	}
 	printf("BME280 device successfully opened.\n");
-	usleep(1000000); // wait for data to settle for first read*/
+	usleep(1000000); // wait for data to settle for first read
 	
 /*********************BME280***********************/
 	
@@ -496,7 +496,7 @@ int main(int argc, char *argv[])
 	
 	Socket_Init();
 
-	for(i = 0; i < 10; i ++)
+	for(i = 0; i < 5; i ++)
 	{
 		
 		// Add a fix offset to previous absoulte time
@@ -512,7 +512,7 @@ int main(int argc, char *argv[])
 		
 		if(UART_send_cmd(&ARD_file) == false)	printf("UART for ARD failed to Send... Path: %s\n", ARD_UART_PATH);
 		if(UART_send_cmd(&RASP_file) == false)	printf("UART for RASP failed to Send... Path: %s\n", RASP_UART_PATH);
-		//LOCAL_temp = bme280ReadValues();
+		LOCAL_temp = bme280ReadValues();
 	        
 				
 		if(UART_receive_temp(&ARD_file, &ARD_temp) == false)	printf("UART for ARD failed to Read... Path: %s\n", ARD_UART_PATH);

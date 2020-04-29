@@ -73,7 +73,7 @@
 
 
 //ARDUINO UART Function
- int Rasp_uart()
+ float Rasp_uart()
 {
    int file, count;
   int store_int;

@@ -37,14 +37,10 @@ char conv[20];
 
 int send_temp;
 
-int file;
 
 
-/////
- char receive[BUFFER_SIZE];      //declare a buffer for receiving data
-//char *ptr;
-//int ch='1';
-/////////
+
+
 int uart_read()
 {
 
@@ -71,15 +67,15 @@ int uart_read()
 serial.c_cflag = B115200 | CS8 | CREAD;
     // Set up Serial Configuration
     serial.c_iflag = IGNPAR|ICRNL;
- //   serial.c_oflag = 0;
-///    serial.c_lflag = 0;
+    serial.c_oflag = 0;
+    serial.c_lflag = 0;
     serial.c_cflag = 0;
 
     
 
    tcsetattr(fd, TCSANOW, &serial); // Apply configuration
 
- //     fcntl(fd, F_SETFL, 0);
+      fcntl(fd, F_SETFL, 0);
 
      rcount = read(fd, buffer, 10);
 
@@ -96,13 +92,8 @@ serial.c_cflag = B115200 | CS8 | CREAD;
     buffer[rcount] = '\0';
 
   //  printf("Received: %s\n", buffer);
-///if (buffer=="1")
-///{
-///	printf("buffer=%s",buffer);
+
     return 10;
-///}
-///else 
-///    return 1;
     }
 
 }
@@ -124,61 +115,16 @@ int main()
 	}
 	// Get I2C device, SI7020_A20 I2C address is 0x40(64)
 	ioctl(file, I2C_SLAVE, Si7021_address);
-	printf("Start\n");
+
 	while(1)
 	{
-/********************************************open file**********************************/
-   if ((file = open("/dev/ttyS0", O_RDWR | O_NOCTTY | O_NDELAY))<0){
-      perror("UART: Failed to open the file.\n");
-      return -1;
-   }
-   struct termios options;               //The termios structure is vital
-   tcgetattr(file, &options);            //Sets the parameters associated with file
-
-   // Set up the communications options:
-   //   9600 baud, 8-bit, enable receiver, no modem control lines
-   options.c_cflag = B115200 | CS8 | CREAD | CLOCAL;
-   options.c_iflag = IGNPAR | ICRNL; 
-   options.c_oflag = 0;
-   options.c_lflag = 0;
-
-   //ignore partity errors, CR -> newline
-   tcflush(file, TCIFLUSH);             //discard file information not transmitted
-   tcsetattr(file, TCSANOW, &options);  //changes occur immmediately
-
-/*****DATA Reading operation*****************************************************/
-   fcntl(file, F_SETFL, 0);
-int count;
-   char receive[BUFFER_SIZE];      //declare a buffer for receiving data
-   if ((count = read(file, (void*)receive, 100))<0){   //receive the data
-      perror("Failed to read from the input\n");
-      return -1;
-   }
-   if (count==0) printf("There was no data available to read!\n");
-   else {
-receive[count]='\0';
-      printf("The following sensor value was read in [%d]: %s\n",count,receive);
-   }
-//close(file);
-
-////////
-///if (strchr(receive,'1'))
-///{
-//usleep(20000);
-///////
-//////////////////////////////
-///			int return_read=uart_read();
-///			if (return_read==10)
-///			{
-///			usleep(20000);
-
-////////////////////////////
 
 
+//			usleep(20000);
 			// Send temperature measurement command, NO HOLD MASTER(0xF3)
 			char config[1] = {0xF3};
 			write(file, config, 1); 
-	//	    	sleep(1);
+		    sleep(1);
 
 			// Read 2 bytes of temperature data
 			// temp msb, temp lsb
@@ -242,9 +188,15 @@ receive[count]='\0';
 serial.c_cflag = B115200 | CS8 | CREAD|CLOCAL;
     // Set up Serial Configuration
     serial.c_iflag = IGNPAR|ICRNL;
+
+/////////////////////////////////
  //   serial.c_oflag = 0;
-///    serial.c_lflag = 0;
+ //   serial.c_lflag = 0;
  //   serial.c_cflag = 0;
+ //   serial.c_cc[VMIN] = 0;
+  //  serial.c_cc[VTIME] = 0;
+/////////////////////////////////
+
 
      tcflush(fd, TCIFLUSH);             //discard file information not transmitted
 
@@ -258,7 +210,7 @@ serial.c_cflag = B115200 | CS8 | CREAD|CLOCAL;
     int wcount; 
     printf("Sending: %s\n", conv);
    
-           wcount = write(fd, conv,4);
+           wcount = write(fd, conv, 10);
     if (wcount < 0) 
     {
         printf("Write Error");
@@ -274,12 +226,8 @@ serial.c_cflag = B115200 | CS8 | CREAD|CLOCAL;
 
 
 
-///}
-///else
-///{
-///printf("\nwaiting for bb data\n");
-///}
 
+ 
 
 
 }

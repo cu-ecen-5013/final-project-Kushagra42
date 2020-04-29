@@ -174,7 +174,7 @@ int var1,var2,t_fine, temp_shift;
 	return temp;
 } 
 
-int User_Modes(int sensor1,int sensor2,int sensor3,char user_mode[20])
+int User_Modes(int sensor1,int sensor2,int sensor3,const char *user_mode)
 {
 
 int argument = atoi(user_mode);

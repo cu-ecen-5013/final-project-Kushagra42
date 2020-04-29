@@ -36,13 +36,9 @@
 #define SLAVE_ADDR 0x76
 //Raspi UART Function
 
-#define START_CHAR		(char)'1'
+#define START_CHAR	(char)'1'
 #define ARD_UART_PATH	"/dev/ttyO4"
 #define RASP_UART_PATH	"/dev/ttyO5"
-
-#define S_TO_NS			(uint32_t)1000000000
-#define MS_TO_NS		(uint32_t)1000000
-#define MS_TO_US		(uint32_t)1000
 
 #define SELECT_R_WAIT_MS	300//
 
@@ -397,7 +393,7 @@ bool UART_periph_init(int *file, char *path)
 	}
 	
 	struct termios options;               //The termios structure is vital
-    tcgetattr(*file, &options);            //Sets the parameters associated with file
+    	tcgetattr(*file, &options);            //Sets the parameters associated with file
 
 	// Set up the communications options:
 	//   9600 baud, 8-bit, enable receiver, no modem control lines
@@ -425,7 +421,6 @@ int main(int argc, char *argv[])
 	uint8_t i;
 	float LOCAL_temp=0, ARD_temp, RASP_temp=0;
 	int I2C_Sensor, ARD_Sensor, Raspi_Sensor;
-	struct timespec prev_t;
 	int tmp;
 	char client_msg[500];
 	
@@ -451,11 +446,7 @@ int main(int argc, char *argv[])
 	for(i = 0; i < 10; i ++)
 	{
 		
-		// Add a fix offset to previous absoulte time
-		prev_t.tv_sec = prev_t.tv_sec + SYNC_TIME_S;
-
-		// Sleep till the absolute time supplied by prev_t
-		
+				
 		hr_dynamic_time_buffer_wait(SYNC_TIME_S*1000);
 		// Dynamic Time Buffer Start....
 		

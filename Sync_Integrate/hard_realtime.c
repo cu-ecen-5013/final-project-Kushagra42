@@ -49,10 +49,11 @@ bool hr_monitor_fd(int *file, uint32_t timeout_ms, uint8_t mask)
 	return true;
 }
 
+
 bool hr_dynamic_time_buffer_wait(uint32_t max_time_ms)
 {
 	static bool first_call = 1; 
-	struct timespec prev_t;
+	static struct timespec prev_t;
 	int resp;
 	uint32_t sec = max_time_ms / 1000; 
 	
@@ -65,13 +66,12 @@ bool hr_dynamic_time_buffer_wait(uint32_t max_time_ms)
 	prev_t.tv_sec += sec;
 	max_time_ms -= sec * 1000;
 	
-	if(prev_t.tv_nsec < (1000000000 - max_time_ms))		
-	prev_t.tv_nsec += max_time_ms;
+	if(prev_t.tv_nsec < (1000000000 - (max_time_ms * 1000000)))		prev_t.tv_nsec += max_time_ms * 1000000;
 
 	else
 	{
 		prev_t.tv_sec += 1;
-		prev_t.tv_nsec = max_time_ms - (1000000000 - prev_t.tv_nsec);
+		prev_t.tv_nsec = (max_time_ms * 1000000) - (1000000000 - prev_t.tv_nsec);
 	}
 	
 	do
@@ -80,6 +80,5 @@ bool hr_dynamic_time_buffer_wait(uint32_t max_time_ms)
 	}while(resp != 0);
 return true;
 }
-
 
 

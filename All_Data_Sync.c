@@ -462,7 +462,7 @@ int main(int argc, char *argv[])
 	int I2C_Sensor, ARD_Sensor, Raspi_Sensor;
 	struct timespec prev_t;
 	uint32_t sleep_time;
-	char client_msg[200];
+	char client_msg[500];
 	
 	int j;
 	int T; // calibrated values
@@ -514,10 +514,6 @@ int main(int argc, char *argv[])
 		
 		// *********** SOCKET SENDING HERE ***********
 		printf("Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\n",ARD_temp,RASP_temp,LOCAL_temp);	// CHANGE TO SYSLOG
-		
-		snprintf(&client_msg[0], 200, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\n",ARD_temp, RASP_temp, LOCAL_temp);
-		
-		Client_Data(&client_msg[0], 200);
 	
 		I2C_Sensor = LOCAL_temp;
 		ARD_Sensor = ARD_temp;
@@ -527,13 +523,13 @@ int main(int argc, char *argv[])
 		
 		//***********Sending Comparison Analysis data ove socket******
 		printf("I2C_Sensor: %.2d\nARD_Sensor: %.2d\nRaspi_Sensor: %.2d\n",I2C_Sensor,ARD_Sensor,Raspi_Sensor);	// CHANGE TO SYSLOG
-		snprintf(&client_msg[0], 200, "Sensor_Selected_Value: %.2d\nSensor Fault detection message: %.2s\n",Sensor_Selected_Value,msg);
-		Client_Data(&client_msg[0], 200);
+		snprintf(&client_msg[0], 500, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor_Selected_Value: %.2d\nSensor Message: %.2s\n",ARD_temp, RASP_temp, LOCAL_temp,Sensor_Selected_Value,msg);
+		Client_Data(&client_msg[0], 500);
 		// Dynamic Time Buffer End....
 	}
 	    	
-	snprintf(&client_msg[0], 200, "EXIT");
-	Client_Data(&client_msg[0], 200);
+	snprintf(&client_msg[0], 500, "EXIT");
+	Client_Data(&client_msg[0], 500);
 
    	close(new_socket);
 

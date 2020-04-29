@@ -488,7 +488,7 @@ int main(int argc, char *argv[])
 		snprintf(&client_msg[0], 200, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor Message: %s\n\n",ARD_temp, RASP_temp, LOCAL_temp,msg);
 		
 		memset(client_msg,0,200);
-		Client_Data(client_msg, strlen(client_msg));
+		Client_Data(&client_msg[0], strlen(client_msg));
 		// Dynamic Time Buffer End....
 	}
 	    	

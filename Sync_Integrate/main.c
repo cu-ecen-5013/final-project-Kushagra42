@@ -174,11 +174,11 @@ int var1,var2,t_fine, temp_shift;
 	return temp;
 } 
 
-int User_Modes(int sensor1,int sensor2,int sensor3,char *user_mode)
+int User_Modes(int sensor1,int sensor2,int sensor3,char user_mode[20])
 {
 
 int argument = atoi(user_mode);
-printf("user mode:%d",argument);
+printf("user mode:%d\n",argument);
 if(argument == 0)
 {
 printf("In comparison mode\n");

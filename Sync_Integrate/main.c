@@ -482,15 +482,15 @@ int main(int argc, char *argv[])
 
 		//***********Sending Comparison Analysis data ove socket******
 		printf("I2C_Sensor: %.2d\nARD_Sensor: %.2d\nRaspi_Sensor: %.2d\n",I2C_Sensor,ARD_Sensor,Raspi_Sensor);	// CHANGE TO SYSLOG/
-		snprintf(&client_msg[0], 500, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor Message: %.2s\n\n",ARD_temp, RASP_temp, LOCAL_temp,msg);
+		snprintf(&client_msg[0], 200, "Ard Temp: %.2f\nRasp Temp: %.2f\nLocal Temp: %.2f\nSensor Message: %s\n\n",ARD_temp, RASP_temp, LOCAL_temp,msg);
 		
 		Client_Data(client_msg, strlen(client_msg));
 		// Dynamic Time Buffer End....
 	}
 	    	
-	snprintf(&client_msg[0], 500, "EXIT");
+	snprintf(&client_msg[0], 200, "EXIT");
 	
-	Client_Data(&client_msg[0], 500);
+	Client_Data(&client_msg[0], strlen(client_msg));
 
    	close(new_socket);
 

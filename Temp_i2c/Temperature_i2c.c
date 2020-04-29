@@ -41,9 +41,7 @@ int file;
 
 int main()
 {
-	time_t time_current;
-	struct tm *local = NULL;
-	char *time_buffer = NULL;
+
 	// Create I2C bus
 	int file_i2c;
 	char *bus = "/dev/i2c-1";
@@ -119,7 +117,7 @@ int main()
 			fTemp = cTemp * 1.8 + 32;
 
 		// Output data to screen
-			printf("TIME:%s  \n  Temperature in Celsius : %.2f C \n",time_buffer, cTemp);
+			printf("TIME:  \n  Temperature in Celsius : %.2f C \n", cTemp);
 			printf("\n  Temperature in Fahrenheit : %.2f F \n", fTemp);
 		}
 		printf("\nstarting uart\n");
@@ -142,7 +140,7 @@ int main()
 		options.c_iflag = IGNPAR | ICRNL; 
 
 		tcflush(fd, TCIFLUSH);  
-        //discard file information not transmitted
+        	//discard file information not transmitted
 		tcsetattr(fd, TCSANOW, &options);  //changes occur immmediately
 
 		int wcount; 

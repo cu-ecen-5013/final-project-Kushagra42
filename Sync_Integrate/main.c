@@ -180,6 +180,7 @@ int User_Modes(int sensor1,int sensor2,int sensor3,char *user_mode)
 int argument = atoi(user_mode);
 if(argument == 0)
 {
+printf("In comparison mode\n");
 	if ((sensor1 == sensor2 && sensor1 == sensor3)||(sensor1 == sensor2 && sensor2 == sensor3))
 	{
 		sprintf(msg, "All sensor data are same %d\n", sensor1);
@@ -215,7 +216,7 @@ if(argument == 0)
 
 if(argument == 1)
 {
-
+printf("In Reference mode\n");
 	if((sensor1 == sensor3) && (sensor2==sensor3))
 	{
 		sprintf(msg, "All sensor data is correct\n");
@@ -252,7 +253,7 @@ if(argument == 1)
 
 if(argument == 2)
 {
-
+printf("In Statistic mode\n");
 	if(((sensor1 == sensor2) && (sensor1 == sensor3))||((sensor1 == sensor2) && (sensor2 == sensor3)))
 	{
 		sprintf(msg, "Final value will be average of all 3 sensors\n");

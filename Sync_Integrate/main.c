@@ -83,7 +83,7 @@ int i, rc;
 unsigned char ucTemp[32];
 unsigned char ucCal[36];
 char filename[32];
- 
+
 	sprintf(filename, "/dev/i2c-%d", iChannel);
 	if ((file_i2c = open(filename, O_RDWR)) < 0)
 	{
@@ -174,12 +174,12 @@ int var1,var2,t_fine, temp_shift;
 	return temp;
 } 
 
-int User_Modes(int sensor1,int sensor2,int sensor3,const char *user_mode)
+int User_Modes(int sensor1,int sensor2,int sensor3,int mode)
 {
 
-int argument = atoi(user_mode);
-printf("user mode:%d\n",argument);
-if(argument == 0)
+
+ 
+if(mode == 0)
 {
 printf("In comparison mode\n");
 	if ((sensor1 == sensor2 && sensor1 == sensor3)||(sensor1 == sensor2 && sensor2 == sensor3))
@@ -215,7 +215,7 @@ printf("In comparison mode\n");
 }
 
 
-if(argument == 1)
+if(mode == 1)
 {
 printf("In Reference mode\n");
 	if((sensor1 == sensor3) && (sensor2==sensor3))
@@ -252,7 +252,7 @@ printf("In Reference mode\n");
 }
 
 
-if(argument == 2)
+if(mode == 2)
 {
 printf("In Statistic mode\n");
 	if(((sensor1 == sensor2) && (sensor1 == sensor3))||((sensor1 == sensor2) && (sensor2 == sensor3)))
@@ -431,7 +431,7 @@ int main(int argc, char *argv[])
 	int I2C_Sensor, ARD_Sensor, Raspi_Sensor;
 	int tmp;
 	char client_msg[500];
-	
+	int mode=0;
 	int j;
 
 /*********************Checking if argument was passed**************************/
@@ -442,19 +442,23 @@ if(argc < 2)
 }
 else
 {
+	
 	if(strcmp(argv[1],"0")==0)
 	{
 		printf("mode selected:0\n");
+		mode =0;
 
 	}
 	else if(strcmp(argv[1],"1")==0)
 	{
 		printf("mode selected:1\n");
+		mode =1;
 
 	}
 	else if(strcmp(argv[1],"2")==0)
 	{
 		printf("mode selected:2\n");
+		mode =2;
 	}
 	else
 	{
@@ -505,7 +509,7 @@ else
 		Raspi_Sensor = RASP_temp;
 		
 		//int Sensor_Selected_Value = User_Modes(I2C_Sensor,ARD_Sensor,Raspi_Sensor);
-		User_Modes(I2C_Sensor,ARD_Sensor,Raspi_Sensor,*argv);
+		User_Modes(I2C_Sensor,ARD_Sensor,Raspi_Sensor,mode);
 
 		//***********Sending Comparison Analysis data ove socket******
 		tmp = (int)(RASP_temp) % 100;

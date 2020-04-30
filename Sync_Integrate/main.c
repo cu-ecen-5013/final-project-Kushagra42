@@ -218,25 +218,25 @@ printf("In comparison mode\n");
 if(mode == 1)
 {
 printf("In Reference mode\n");
-	if((sensor1 == sensor3) && (sensor2==sensor3))
+	if((sensor2 == sensor1) && (sensor3==sensor1))
 	{
 		sprintf(msg, "All sensor data is correct\n");
 		printf("%s", msg);
 		return sensor3;
 	}
-	else if((sensor1 != sensor3) && (sensor2 == sensor3))
+	else if((sensor3 != sensor1) && (sensor2 == sensor1))
 	{
 		sprintf(msg, "Sensor 1 data is wrong\n");
 		printf("%s", msg);
 		return sensor3;
 	}
-	else if((sensor1 == sensor3) && (sensor2 != sensor3))
+	else if((sensor3 == sensor1) && (sensor2 != sensor1))
 	{
 		sprintf(msg, "Sensor 2 data is wrong\n");
 		printf("%s", msg);
 		return sensor3;
 	}
-  	else if((sensor1 == sensor2) && (sensor1 != sensor3))
+  	else if((sensor3 == sensor2) && (sensor3 != sensor1))
 	{
 		sprintf(msg, "Sensor 3 data is wrong\n");
 		printf("%s", msg);
@@ -445,19 +445,16 @@ else
 	
 	if(strcmp(argv[1],"0")==0)
 	{
-		printf("mode selected:0\n");
 		mode =0;
 
 	}
 	else if(strcmp(argv[1],"1")==0)
 	{
-		printf("mode selected:1\n");
 		mode =1;
 
 	}
 	else if(strcmp(argv[1],"2")==0)
 	{
-		printf("mode selected:2\n");
 		mode =2;
 	}
 	else

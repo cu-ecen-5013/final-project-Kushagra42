@@ -190,19 +190,19 @@ printf("In comparison mode\n");
 	}
 	else if (sensor1 == sensor2 && sensor1 != sensor3)
 	{
-		sprintf(msg, "sensor1 and sensor2 data are same %d\n", sensor1);
+		sprintf(msg, "Local temp and ARD Temp data are same %d\n", sensor1);
 		printf("%s", msg);
 		return sensor1;
 	}
 	else if (sensor1 != sensor2 && sensor2 == sensor3)
 	{
-		sprintf(msg, "sensor2 and sensor3 data are same %d\n", sensor2);
+		sprintf(msg, "ARD Temp and Raspi Temp data are same %d\n", sensor2);
 		printf("%s", msg);
 		return sensor2;
 	}
 	else if (sensor1 != sensor2 && sensor1 == sensor3)
 	{
-		sprintf(msg, "sensor1 and sensor3 data are same %d\n", sensor3);
+		sprintf(msg, "Local temp and Raspi Temp data are same %d\n", sensor3);
 		printf("%s", msg);
 		return sensor3;
 	}
@@ -226,19 +226,19 @@ printf("In Reference mode\n");
 	}
 	else if((sensor3 != sensor1) && (sensor2 == sensor1))
 	{
-		sprintf(msg, "Sensor 1 data is wrong\n");
+		sprintf(msg, "Local temp data is wrong\n");
 		printf("%s", msg);
 		return sensor3;
 	}
 	else if((sensor3 == sensor1) && (sensor2 != sensor1))
 	{
-		sprintf(msg, "Sensor 2 data is wrong\n");
+		sprintf(msg, "ARD Temp data is wrong\n");
 		printf("%s", msg);
 		return sensor3;
 	}
-  	else if((sensor3 == sensor2) && (sensor3 != sensor1))
+  	else if((sensor3 != sensor2) && (sensor3 != sensor1))
 	{
-		sprintf(msg, "Sensor 3 data is wrong\n");
+		sprintf(msg, "ARD Temp and Raspi Temp data is wrong\n");
 		printf("%s", msg);
 		return sensor3;
 	}
@@ -271,21 +271,21 @@ printf("In Statistic mode\n");
 	}
 	else if((sensor1 == sensor2+1 || sensor1 ==  sensor2-1) && (sensor1 != sensor3+2 || sensor1 != sensor3-2) && (sensor2 != sensor3+1 || sensor3 != sensor3-1))
 	{
-		sprintf(msg, "Sensor 3 is not in range\n");
+		sprintf(msg, "Raspi Temp is not in range\n");
 		printf("%s", msg);
 		int avg_temp = (sensor1 + sensor2)/2;
 		return avg_temp;
 	}
 	else if((sensor1 != sensor2+1 || sensor1 != sensor2-1) && (sensor1 == sensor3+1 || sensor1 == sensor3-1) && (sensor2 != sensor3+1 || sensor3 != sensor3-1))
 	{
-		sprintf(msg, "Sensor 2 is not in range\n");
+		sprintf(msg, "ARD TEmp is not in range\n");
 		printf("%s", msg);
 		int avg_temp = (sensor1 + sensor3)/2;
 		return avg_temp;
 	}
 	else if((sensor1 != sensor2+1 || sensor1 != sensor2-1) && (sensor1 != sensor3+1 || sensor1 != sensor3-1) && (sensor2 == sensor3+1 || sensor3 == sensor3-1))
 	{
-		sprintf(msg, "Sensor 1 is not in range\n");
+		sprintf(msg, "LOcal Temp is not in range\n");
 		printf("%s", msg);
 		int avg_temp = (sensor3 + sensor2)/2;
 		return avg_temp;
@@ -426,7 +426,7 @@ int main(int argc, char *argv[])
 {
 	char rasp_msg[20], ard_msg[20], local_msg[20];
 	int ARD_file, RASP_file;
-	uint8_t i;
+	
 	float LOCAL_temp=0, ARD_temp, RASP_temp=0;
 	int I2C_Sensor, ARD_Sensor, Raspi_Sensor;
 	int tmp;
@@ -479,7 +479,7 @@ else
 			
 	Socket_Init();
 
-	for(i = 0; i < 500; i++)
+	while(1)
 	{
 		
 				
